@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aria — AI Document Analyst</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS (style guide palette) ───────────────────────────────────────── */
+:root {
+  --font:         'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Playfair Display', serif;
+
+  /* Kit colours */
+  --blue:       #1314B5;
+  --dark-blue:  #03369D;
+  --light-blue: #DFE9FF;
+  --gray-light: #DBE1E8;
+  --gray:       #767A8C;
+  --gray-dark:  #4B5666;
+  --dark:       #131415;
+  --kit-light:  #F2F4F7;
+  --white:      #FFFFFF;
+
+  /* Functional */
+  --accent:       #1A9B72;
+  --accent-light: #E2F5EE;
+  --red:          #B33030;
+  --red-light:    #FCEAEA;
+  --blue-xlight:  #EEF2FF;
+
+  /* Radius */
+  --r-xs: 6px;  --r-sm: 8px;  --r: 12px;  --r-lg: 16px;  --r-xl: 20px;
+
+  /* Shadows */
+  --sh-xs: 0 1px 2px rgba(3,54,157,.07);
+  --sh-sm: 0 1px 5px rgba(3,54,157,.10);
+}
+
+/* ── RESET ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--kit-light);
+  color: var(--dark);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--dark-blue);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-inner {
+  max-width: 960px; margin: 0 auto;
+  padding: 0 32px; height: 62px;
+  display: flex; align-items: center; gap: 20px;
+}
+
+/* Logo */
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+.logo-mark {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-mark svg { width: 32px; height: 32px; stroke: #DFE9FF; fill: none; stroke-width: 1.5; }
+.logo-text { display: flex; flex-direction: column; line-height: 1; }
+.logo-name {
+  font-family: var(--font);
+  font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -.2px;
+}
+.logo-tag {
+  font-family: var(--font);
+  font-size: 8.5px; font-weight: 600;
+  color: rgba(255,255,255,.82);
+  letter-spacing: .22em; text-transform: uppercase; margin-top: 5px;
+}
+
+/* Divider */
+.topbar-sep { width: 1px; height: 26px; background: rgba(255,255,255,.14); flex-shrink: 0; }
+
+/* Nav */
+.nav { display: flex; align-items: stretch; height: 62px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 22px;
+  border: none; background: none;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,.52); letter-spacing: .01em;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  transition: color .14s, border-color .14s, background .14s;
+  white-space: nowrap;
+}
+.nav-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.75; flex-shrink: 0; }
+.nav-btn:hover { color: rgba(255,255,255,.84); background: rgba(255,255,255,.05); }
+.nav-btn.active { color: #fff; border-bottom-color: var(--light-blue); }
+.nav-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .04em;
+  background: rgba(223,233,255,.14); color: rgba(255,255,255,.52);
+  border: 1px solid rgba(223,233,255,.20);
+  padding: 2px 7px; border-radius: 20px;
+}
+
+/* ── BODY ────────────────────────────────────────────────────────────────── */
+.body-wrap { max-width: 960px; margin: 0 auto; padding: 0 32px 80px; width: 100%; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── PAGE HERO ───────────────────────────────────────────────────────────── */
+.page-hero {
+  padding: 48px 0 28px;
+  border-bottom: 1px solid var(--gray-light);
+  margin-bottom: 32px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+}
+.page-hero h1 {
+  font-size: 28px; font-weight: 700; color: var(--dark);
+  letter-spacing: -.5px; line-height: 1.2; margin-bottom: 8px;
+}
+.page-hero p { font-size: 13.5px; color: var(--gray); line-height: 1.7; max-width: 440px; }
+
+.online-badge {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--accent-light); border: 1px solid rgba(26,155,114,.2);
+  border-radius: 20px; padding: 5px 13px 5px 9px; flex-shrink: 0;
+}
+.online-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(26,155,114,.45); }
+  50%      { box-shadow: 0 0 0 5px rgba(26,155,114,.0); }
+}
+.online-text { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+
+/* ── BANNERS ─────────────────────────────────────────────────────────────── */
+.banner {
+  display: none; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 500; margin-bottom: 18px;
+}
+.banner svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; flex-shrink: 0; }
+.banner.success { background: var(--accent-light); border: 1px solid rgba(26,155,114,.25); color: #0B6E4F; }
+.banner.error   { background: var(--red-light);    border: 1px solid rgba(179,48,48,.22);  color: var(--red); }
+@keyframes bIn  { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:none; } }
+@keyframes bOut { from { opacity:1; } to { opacity:0; transform:translateY(-5px); } }
+
+/* ── PROGRESS ────────────────────────────────────────────────────────────── */
+.progress-wrap { display: none; margin-bottom: 18px; }
+.progress-track { height: 3px; background: var(--gray-light); border-radius: 99px; overflow: hidden; }
+.progress-fill  { height: 100%; background: var(--blue); border-radius: 99px; transition: width .3s ease; width: 0%; }
+.progress-lbl   { font-size: 11px; color: var(--gray); margin-top: 7px; text-align: center; font-weight: 500; }
+
+/* ── CARD ────────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-light);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-sm);
+  overflow: hidden; margin-bottom: 18px;
+}
+.card-section { padding: 26px 30px; border-bottom: 1px solid var(--gray-light); }
+.card-section:last-child { border-bottom: none; }
+
+.slabel {
+  font-size: 10px; font-weight: 700; color: var(--gray);
+  text-transform: uppercase; letter-spacing: .12em;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.slabel::after { content: ''; flex: 1; height: 1px; background: var(--gray-light); }
+.req { color: #C53030; margin-left: 1px; }
+
+/* ── DROP ZONE ───────────────────────────────────────────────────────────── */
+.drop-zone {
+  border: 1.5px dashed var(--gray-light);
+  border-radius: var(--r); padding: 40px 24px;
+  text-align: center; cursor: pointer;
+  transition: border-color .18s, background .18s;
+  background: var(--kit-light);
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--blue); background: var(--blue-xlight); }
+.dz-icon {
+  width: 46px; height: 46px;
+  background: var(--white); border: 1px solid var(--gray-light);
+  border-radius: var(--r); box-shadow: var(--sh-xs);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+.dz-icon svg { width: 20px; height: 20px; stroke: var(--blue); fill: none; stroke-width: 1.6; }
+.drop-zone h3 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
+.drop-zone p  { font-size: 12.5px; color: var(--gray); }
+.browse { color: var(--blue); font-weight: 700; text-decoration: underline; cursor: pointer; }
+.ftype-row { display: flex; gap: 5px; justify-content: center; margin-top: 14px; }
+.ftag {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 9px; border-radius: 20px;
+  background: var(--white); color: var(--gray); border: 1px solid var(--gray-light);
+}
+
+/* ── FILE LIST ───────────────────────────────────────────────────────────── */
+.file-list { display: none; flex-direction: column; gap: 6px; margin-top: 12px; }
+.file-row  { display: flex; align-items: center; gap: 8px; }
+.file-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 11px;
+  background: var(--white); border: 1px solid var(--gray-light);
+  border-radius: var(--r-sm); box-shadow: var(--sh-xs);
+  flex: 0 1 55%; min-width: 0;
+}
+.file-item-main { display: contents; }
+.fext {
+  width: 30px; height: 30px; border-radius: var(--r-xs);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 800; flex-shrink: 0; letter-spacing: .02em;
+}
+.fext.pdf   { background: #FBECe7; color: #8B3216; }
+.fext.doc   { background: var(--light-blue); color: var(--dark-blue); }
+.fext.xls   { background: #E6F4DF; color: #2F6417; }
+.fext.other { background: var(--kit-light); color: var(--gray); }
+.fname {
+  font-size: 12px; font-weight: 500; color: var(--dark);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1; min-width: 0;
+}
+.fsize { font-size: 11px; color: var(--gray); flex-shrink: 0; font-weight: 500; }
+.frm {
+  width: 20px; height: 20px; border: none; background: none;
+  cursor: pointer; color: var(--gray-light);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; transition: all .14s; flex-shrink: 0;
+}
+.frm:hover { background: var(--red-light); color: var(--red); }
+
+.file-cat-select {
+  flex: 1; min-width: 0; height: 34px;
+  padding: 0 28px 0 11px;
+  font-size: 12px; font-weight: 500; font-family: var(--font); color: var(--gray-dark);
+  background-color: var(--light-blue);
+  border: 1.5px solid rgba(3,54,157,.18);
+  border-radius: var(--r-sm);
+  outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2303369D' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center; background-size: 9px;
+  transition: border-color .14s, box-shadow .14s;
+}
+.file-cat-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(19,20,181,.09); }
+
+/* ── FORM ────────────────────────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1/-1; }
+.flabel { font-size: 12px; font-weight: 600; color: var(--gray-dark); }
+.fopt   { font-weight: 400; color: var(--gray); }
+.form-control {
+  width: 100%; padding: 9px 13px;
+  font-size: 13px; font-family: var(--font); font-weight: 400; color: var(--dark);
+  background: var(--white);
+  border: 1.5px solid var(--gray-light);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color .14s, box-shadow .14s;
+  -webkit-appearance: none; appearance: none;
+}
+.form-control:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(19,20,181,.09); }
+.form-control::placeholder { color: var(--gray-light); }
+select.form-control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%23767A8C' d='M5.5 7.5L1 2h9z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer;
+}
+textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
+
+/* ── CARD FOOTER ─────────────────────────────────────────────────────────── */
+.card-footer {
+  padding: 16px 30px; background: var(--kit-light);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.footer-note { font-size: 12px; color: var(--gray); font-weight: 500; }
+.btn-group { display: flex; gap: 10px; }
+
+.btn {
+  padding: 9px 20px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 600; font-family: var(--font);
+  cursor: pointer; transition: all .14s;
+  display: flex; align-items: center; gap: 7px; white-space: nowrap;
+}
+.btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+.btn-ghost {
+  background: var(--white); border: 1.5px solid var(--gray-light); color: var(--gray-dark);
+}
+.btn-ghost:hover { border-color: var(--gray); color: var(--dark); }
+
+.btn-primary {
+  background: #131415; border: 1.5px solid #131415; color: var(--white);
+  box-shadow: 0 2px 8px rgba(19,20,21,.22);
+}
+.btn-primary:hover  { background: #033690; border-color: #033690; box-shadow: 0 2px 10px rgba(3,54,144,.30); }
+.btn-primary:active { background: #033690; border-color: #033690; color: var(--gray); transform: scale(.98); box-shadow: none; }
+.btn-primary:disabled {
+  background: var(--gray-light); border-color: var(--gray-light);
+  color: var(--gray); cursor: not-allowed; box-shadow: none; transform: none;
+  opacity: 0.7;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: white; border-radius: 50%;
+  animation: spin .7s linear infinite; flex-shrink: 0;
+}
+
+/* ── CHAT TAB ────────────────────────────────────────────────────────────── */
+.chat-hero { padding: 48px 0 28px; border-bottom: 1px solid var(--gray-light); margin-bottom: 32px; }
+.chat-hero h1 { font-size: 28px; font-weight: 700; color: var(--dark); letter-spacing: -.5px; margin-bottom: 8px; }
+.chat-hero p  { font-size: 13.5px; color: var(--gray); line-height: 1.7; }
+
+.chat-shell {
+  background: var(--white); border: 1px solid var(--gray-light);
+  border-radius: var(--r-xl); box-shadow: var(--sh-sm);
+  overflow: hidden; display: flex; flex-direction: column; height: 560px;
+}
+.chat-topbar {
+  padding: 14px 20px; border-bottom: 1px solid var(--gray-light);
+  background: var(--kit-light);
+  display: flex; align-items: center; gap: 11px;
+}
+.chat-av {
+  width: 34px; height: 34px; background: var(--dark-blue);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.chat-av svg { width: 15px; height: 15px; stroke: white; fill: none; stroke-width: 1.75; }
+.chat-av-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+.chat-av-sub  { font-size: 11px; color: var(--gray); margin-top: 1px; font-weight: 500; }
+.chat-offline { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-light); margin-left: auto; flex-shrink: 0; }
+
+.chat-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 28px; text-align: center;
+}
+.cs-icon {
+  width: 54px; height: 54px;
+  background: var(--light-blue); border: 1px solid rgba(3,54,157,.14);
+  border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.cs-icon svg { width: 22px; height: 22px; stroke: var(--dark-blue); fill: none; stroke-width: 1.5; }
+.cs-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+.cs-body  { font-size: 13.5px; color: var(--gray); line-height: 1.7; max-width: 360px; }
+.cs-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 22px; }
+.cs-chip  {
+  font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px;
+  background: var(--kit-light); border: 1px solid var(--gray-light); color: var(--gray-dark);
+}
+
+.chat-input-bar {
+  padding: 13px 16px; border-top: 1px solid var(--gray-light);
+  background: var(--kit-light);
+  display: flex; gap: 8px; align-items: center;
+}
+.chat-input {
+  flex: 1; padding: 9px 14px;
+  font-size: 13px; font-family: var(--font); color: var(--dark);
+  background: var(--white); border: 1.5px solid var(--gray-light);
+  border-radius: var(--r-sm); outline: none;
+}
+.chat-input::placeholder { color: var(--gray-light); }
+.chat-input:disabled { opacity: .45; cursor: not-allowed; }
+.chat-send {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: var(--blue); border: none; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: not-allowed; opacity: .35;
+}
+.chat-send svg { width: 13px; height: 13px; stroke: white; fill: none; stroke-width: 1.8; }
+
+/* ── MOBILE ──────────────────────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  .topbar-inner, .body-wrap { padding-left: 18px; padding-right: 18px; }
+  .logo-tag, .topbar-sep { display: none; }
+  .nav-btn { padding: 0 14px; font-size: 12.5px; }
+  .page-hero { flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px 0 22px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .card-footer { flex-direction: column; align-items: flex-start; }
+  .card-section { padding: 20px 18px; }
+  .file-row { flex-direction: column; align-items: stretch; }
+  .file-item { flex: none; width: 100%; }
+  .chat-shell { height: 480px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="#">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+          <line x1="9" y1="17" x2="12" y2="17"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">Aria</span>
+        <span class="logo-tag">AI Document Analyst</span>
+      </div>
+    </a>
+
+    <div class="topbar-sep"></div>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-tab="upload" type="button">
+        <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        Upload
+      </button>
+      <button class="nav-btn" data-tab="chat" type="button">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Ask Aria
+        <span class="nav-badge">Soon</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- BODY -->
+<main class="body-wrap">
+
+  <!-- UPLOAD TAB -->
+  <div class="tab-panel active" id="panel-upload">
+
+    <div class="page-hero">
+      <div>
+        <h1>Upload a document</h1>
+        <p>Files are automatically classified, tagged, and indexed for AI-powered analysis.</p>
+      </div>
+      <div class="online-badge">
+        <div class="online-dot"></div>
+        <span class="online-text">System online</span>
+      </div>
+    </div>
+
+    <div class="banner success" id="bannerSuccess">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div><strong>Uploaded successfully.</strong> Your file has been received and is being processed.</div>
+    </div>
+    <div class="banner error" id="bannerError">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+      <div id="errorMsg">Something went wrong. Please try again.</div>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
+      <div class="progress-lbl" id="progressLabel">Preparing upload...</div>
+    </div>
+
+    <div class="card">
+
+      <!-- File section -->
+      <div class="card-section">
+        <div class="slabel">File <span class="req">*</span></div>
+        <label for="fileInput" style="display:block;cursor:pointer">
+          <div class="drop-zone" id="dropZoneInner">
+            <div class="dz-icon">
+              <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </div>
+            <h3>Drop your files here</h3>
+            <p>or <span class="browse">click to browse</span> &middot; multiple files allowed</p>
+            <div class="ftype-row">
+              <span class="ftag">PDF</span>
+              <span class="ftag">Word</span>
+              <span class="ftag">Excel</span>
+            </div>
+          </div>
+        </label>
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple
+          style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px">
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <!-- Document details -->
+      <div class="card-section">
+        <div class="slabel">Document details</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="flabel">Department <span class="req">*</span></label>
+            <select class="form-control" id="selDept">
+              <option value="">Select department</option>
+              <option>Finance</option><option>Operations</option>
+              <option>Marketing</option><option>Sales</option>
+              <option>IT</option><option>Executive</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="flabel">Notes <span class="fopt">(optional)</span></label>
+            <textarea class="form-control" id="inputNotes" placeholder="Any additional context about this document..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uploaded by -->
+      <div class="card-section">
+        <div class="slabel">Uploaded by</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="flabel">Your name <span class="req">*</span></label>
+            <input type="text" class="form-control" id="inputUploaderName" placeholder="e.g. Jane Smith">
+          </div>
+          <div class="form-group">
+            <label class="flabel">Your email <span class="fopt">(optional)</span></label>
+            <input type="email" class="form-control" id="inputUploaderEmail" placeholder="e.g. jane@company.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer">
+        <span class="footer-note">Fields marked <span style="color:#C53030;font-weight:700">*</span> are required</span>
+        <div class="btn-group">
+          <button class="btn btn-ghost" id="btnClear" type="button">
+            <svg viewBox="0 0 24 24">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+            Clear
+          </button>
+          <button class="btn btn-primary" id="btnSubmit" type="button">
+            <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Upload to SharePoint
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHAT TAB -->
+  <div class="tab-panel" id="panel-chat">
+
+    <div class="chat-hero">
+      <h1>Ask Aria</h1>
+      <p>Query your document library using natural language. Powered by Azure AI Foundry.</p>
+    </div>
+
+    <div class="chat-shell">
+      <div class="chat-topbar">
+        <div class="chat-av">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div>
+          <div class="chat-av-name">Aria</div>
+          <div class="chat-av-sub">AI Document Analyst</div>
+        </div>
+        <div class="chat-offline"></div>
+      </div>
+
+      <div class="chat-body">
+        <div class="cs-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="cs-title">Chat interface coming soon</div>
+        <div class="cs-body">Aria will let you query uploaded documents, retrieve records, and surface financial insights — all in plain language.</div>
+        <div class="cs-chips">
+          <span class="cs-chip">Summarise invoices</span>
+          <span class="cs-chip">Find purchase orders</span>
+          <span class="cs-chip">Stock report trends</span>
+          <span class="cs-chip">Export data</span>
+        </div>
+      </div>
+
+      <div class="chat-input-bar">
+        <input class="chat-input" type="text" placeholder="Ask about your documents…" disabled>
+        <button class="chat-send" disabled type="button">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+/* Tab switching */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+  });
+});
+
+/* Config */
+const FLOW_URL = 'https://default3a655eac4a934e91999a366baf02ca.c8.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e8001c1838474bf5bade5eae9ced8846/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8flBlD9HtzDWir2PW5uGKMSDVGiGGpIndFoDgPw2Cs0';
+const DEMO_MODE = FLOW_URL === '';
+
+const CAT_OPTS = [
+  { value: '',               label: 'Select category' },
+  { value: 'All Categories', label: 'All Categories — Monthly Report' },
+  { value: 'Beverages',      label: '1 — Beverages' },
+  { value: 'Condiments',     label: '2 — Condiments' },
+  { value: 'Confections',    label: '3 — Confections' },
+  { value: 'Dairy Products', label: '4 — Dairy Products' },
+  { value: 'Grains/Cereals', label: '5 — Grains / Cereals' },
+  { value: 'Meat/Poultry',   label: '6 — Meat / Poultry' },
+  { value: 'Produce',        label: '7 — Produce' },
+  { value: 'Seafood',        label: '8 — Seafood' },
+];
+
+let files = [];
+let bannerTimer = null;
+const isStock = n => n.toLowerCase().startsWith('stockreport_');
+
+document.getElementById('fileInput').addEventListener('change', function () { addFiles(this.files); });
+const dz = document.getElementById('dropZoneInner');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', ()  => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
+
+function syncSubmitBtn() {
+  document.getElementById('btnSubmit').disabled = files.length === 0;
+}
+
+function addFiles(fs) {
+  for (const f of fs) files.push({ file: f, category: '' });
+  renderFiles();
+  syncSubmitBtn();
+}
+
+function renderFiles() {
+  const list = document.getElementById('fileList');
+  if (!files.length) { list.style.display = 'none'; return; }
+  list.style.display = 'flex';
+  list.innerHTML = files.map((entry, i) => {
+    const f   = entry.file;
+    const ext = f.name.split('.').pop().toLowerCase();
+    const cls = ext==='pdf'?'pdf':['doc','docx'].includes(ext)?'doc':['xls','xlsx'].includes(ext)?'xls':'other';
+    const sz  = f.size < 1048576 ? (f.size/1024).toFixed(0)+'KB' : (f.size/1048576).toFixed(1)+'MB';
+    const cat = isStock(f.name)
+      ? `<select class="file-cat-select" data-index="${i}">${CAT_OPTS.map(o=>`<option value="${o.value}"${entry.category===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`
+      : '';
+    return `<div class="file-row"><div class="file-item"><div class="file-item-main"><div class="fext ${cls}">${ext.toUpperCase().slice(0,3)}</div><span class="fname">${f.name}</span><span class="fsize">${sz}</span><button class="frm" data-i="${i}" type="button"><svg width="11" height="11" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="1.5" y1="1.5" x2="11.5" y2="11.5"/><line x1="11.5" y1="1.5" x2="1.5" y2="11.5"/></svg></button></div></div>${cat}</div>`;
+  }).join('');
+  list.querySelectorAll('.frm').forEach(b =>
+    b.addEventListener('click', function () { files.splice(+this.dataset.i, 1); renderFiles(); syncSubmitBtn(); })
+  );
+  list.querySelectorAll('.file-cat-select').forEach(s =>
+    s.addEventListener('change', function () { files[+this.dataset.index].category = this.value; })
+  );
+}
+
+function extractOrderID(name) {
+  const n = name.toLowerCase();
+  if (n.startsWith('invoice_'))         return name.slice(8).replace(/\.(pdf|docx|xlsx)$/i,'');
+  if (n.startsWith('purchase_orders_')) return name.slice(16).replace(/\.(pdf|docx|xlsx)$/i,'');
+  if (n.startsWith('order_'))           return name.slice(6).replace(/\.(pdf|docx|xlsx)$/i,'');
+  return '';
+}
+
+function hideBanner(el) {
+  el.style.animation = 'bOut .26s ease forwards';
+  setTimeout(() => { el.style.display='none'; el.style.animation=''; }, 260);
+}
+function showBanner(type, msg) {
+  if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
+  const s = document.getElementById('bannerSuccess');
+  const e = document.getElementById('bannerError');
+  s.style.display = 'none'; e.style.display = 'none';
+  if (type === 'success') {
+    s.style.animation = 'bIn .26s ease'; s.style.display = 'flex';
+    bannerTimer = setTimeout(() => hideBanner(s), 4000);
+  } else {
+    document.getElementById('errorMsg').textContent = msg || 'Something went wrong. Please try again.';
+    e.style.animation = 'bIn .26s ease'; e.style.display = 'flex';
+    bannerTimer = setTimeout(() => hideBanner(e), 5000);
+  }
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+}
+
+function setProgress(pct, label) {
+  const wrap = document.getElementById('progressWrap');
+  const bar  = document.getElementById('progressBar');
+  const lbl  = document.getElementById('progressLabel');
+  if (pct === null) { wrap.style.display='none'; bar.style.width='0%'; return; }
+  wrap.style.display='block'; bar.style.width=pct+'%'; lbl.textContent=label;
+}
+
+function setBtn(loading) {
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<div class="spinner"></div> Uploading...'
+    : '<svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Upload to SharePoint';
+}
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Could not read file'));
+    r.readAsDataURL(file);
+  });
+}
+
+async function handleSubmit() {
+  if (!files.length)                                                  { showBanner('error','Please select at least one file.'); return; }
+  if (!document.getElementById('selDept').value)                     { showBanner('error','Please select a department.'); return; }
+  if (!document.getElementById('inputUploaderName').value.trim())    { showBanner('error','Please enter your name.'); return; }
+
+  const uploaderName  = document.getElementById('inputUploaderName').value.trim();
+  const uploaderEmail = document.getElementById('inputUploaderEmail').value.trim();
+  const uploadedBy    = uploaderEmail ? `${uploaderName} <${uploaderEmail}>` : uploaderName;
+
+  setBtn(true); setProgress(10, 'Reading files…');
+
+  if (DEMO_MODE) {
+    setTimeout(() => setProgress(40,'Encoding files…'), 400);
+    setTimeout(() => setProgress(70,'Sending to SharePoint…'), 900);
+    setTimeout(() => setProgress(95,'Finalising…'), 1400);
+    setTimeout(() => { setProgress(null); setBtn(false); showBanner('success'); resetFields(); }, 2000);
+    return;
+  }
+
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const { file, category } = files[i];
+      setProgress(Math.round(20 + (i/files.length)*60), `Uploading ${i+1} of ${files.length}: ${file.name}`);
+      const base64  = await toBase64(file);
+      const payload = {
+        fileName:     file.name,
+        fileContent:  base64,
+        department:   document.getElementById('selDept').value,
+        documentDate: new Date().toISOString().split('T')[0],
+        orderID:      extractOrderID(file.name),
+        category,
+        notes:        document.getElementById('inputNotes').value,
+        uploadedBy
+      };
+      const res = await fetch(FLOW_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      if (!res.ok && res.status !== 202) throw new Error(`${file.name} — server returned ${res.status}`);
+    }
+    setProgress(null); setBtn(false); showBanner('success'); resetFields();
+  } catch (err) {
+    setProgress(null); setBtn(false);
+    showBanner('error','Upload failed: ' + err.message + '. Check your network and try again.');
+  }
+}
+
+function resetFields() {
+  files = []; renderFiles(); syncSubmitBtn();
+  ['inputNotes','inputUploaderName','inputUploaderEmail'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('selDept').value = '';
+}
+function resetForm() {
+  resetFields();
+  if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
+  document.getElementById('bannerSuccess').style.display = 'none';
+  document.getElementById('bannerError').style.display   = 'none';
+  setProgress(null);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  syncSubmitBtn(); // disabled until files added
+  document.getElementById('btnSubmit').addEventListener('click', handleSubmit);
+  document.getElementById('btnClear').addEventListener('click', resetForm);
+});
+</script>
+</body>
+</html>
