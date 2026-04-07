@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Aria</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────────────────── */
+:root {
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --blue:       #1314B5;
+  --dark-blue:  #03369D;
+  --light-blue: #DFE9FF;
+  --gray-light: #DBE1E8;
+  --gray:       #767A8C;
+  --gray-dark:  #4B5666;
+  --dark:       #131415;
+  --kit-light:  #F2F4F7;
+  --white:      #FFFFFF;
+  --accent:     #1A9B72;
+  --accent-lt:  #E2F5EE;
+  --red:        #B33030;
+  --red-lt:     #FCEAEA;
+  --blue-xl:    #EEF2FF;
+  --r-xs:4px; --r-sm:8px; --r:12px; --r-lg:16px; --r-xl:20px;
+  --sh-xs: 0 1px 2px rgba(3,54,157,.07);
+  --sh-sm: 0 1px 5px rgba(3,54,157,.10);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:var(--font); background:var(--kit-light); color:var(--dark); min-height:100vh; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+
+/* ── TOPBAR ──────────────────────────────────────────────────────────────── */
+.topbar { background:#14294A; border-bottom:1px solid rgba(255,255,255,.10); position:sticky; top:0; z-index:100; }
+.topbar-inner { max-width:1140px; margin:0 auto; padding:0 32px; height:62px; display:flex; align-items:center; gap:20px; }
+.logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+.logo-mark svg { width:32px; height:32px; stroke:#DFE9FF; fill:none; stroke-width:1.5; }
+.logo-text { display:flex; flex-direction:column; line-height:1; }
+.logo-name { font-size:20px; font-weight:700; color:#fff; letter-spacing:-.2px; }
+.logo-tag  { font-size:8.5px; font-weight:600; color:rgba(255,255,255,.82); letter-spacing:.22em; text-transform:uppercase; margin-top:5px; }
+.topbar-sep { width:1px; height:26px; background:rgba(255,255,255,.14); flex-shrink:0; }
+.topbar-right { margin-left:auto; font-size:12px; font-weight:600; color:rgba(255,255,255,.5); letter-spacing:.01em; }
+.nav { display:flex; align-items:stretch; height:62px; }
+.nav-link {
+  display:flex; align-items:center; gap:7px; padding:0 22px;
+  text-decoration:none; font-family:var(--font); font-size:13px; font-weight:600;
+  color:rgba(255,255,255,.52); letter-spacing:.01em;
+  border-bottom:2.5px solid transparent;
+  transition:color .14s, border-color .14s, background .14s; white-space:nowrap;
+}
+.nav-link svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.75; flex-shrink:0; }
+.nav-link:hover { color:rgba(255,255,255,.84); background:rgba(255,255,255,.05); }
+.nav-link.active { color:#fff; border-bottom-color:var(--light-blue); }
+
+/* ── PAGE ────────────────────────────────────────────────────────────────── */
+.page-wrap { max-width:1140px; margin:0 auto; padding:0 32px 80px; }
+.page-hero { padding:40px 0 24px; border-bottom:1px solid var(--gray-light); margin-bottom:28px; display:flex; align-items:flex-end; justify-content:space-between; gap:20px; }
+.page-hero h1 { font-size:26px; font-weight:700; color:var(--dark); letter-spacing:-.5px; margin-bottom:6px; }
+.page-hero p  { font-size:13px; color:var(--gray); line-height:1.7; max-width:440px; }
+.online-badge { display:flex; align-items:center; gap:7px; background:var(--accent-lt); border:1px solid rgba(26,155,114,.2); border-radius:20px; padding:5px 13px 5px 9px; flex-shrink:0; }
+.online-dot   { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(26,155,114,.45)} 50%{box-shadow:0 0 0 5px rgba(26,155,114,0)} }
+.online-text  { font-size:11.5px; font-weight:700; color:var(--accent); }
+
+/* ── BANNERS ─────────────────────────────────────────────────────────────── */
+.alert { display:none; align-items:center; gap:10px; padding:12px 16px; border-radius:var(--r-sm); font-size:13px; font-weight:500; margin-bottom:20px; }
+.alert svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.75; flex-shrink:0; }
+.alert.error   { background:var(--red-lt);  border:1px solid rgba(179,48,48,.22);  color:var(--red); }
+.alert.info    { background:var(--blue-xl); border:1px solid rgba(19,20,181,.14);  color:var(--dark-blue); }
+
+/* ── SETUP NOTICE ────────────────────────────────────────────────────────── */
+.setup-notice {
+  background:var(--blue-xl); border:1.5px dashed rgba(19,20,181,.25);
+  border-radius:var(--r-lg); padding:20px 24px; margin-bottom:24px;
+}
+.setup-notice h3 { font-size:13px; font-weight:700; color:var(--dark-blue); margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+.setup-notice h3 svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.75; }
+.setup-notice ol { padding-left:18px; font-size:12.5px; color:var(--gray-dark); line-height:1.9; }
+.setup-notice code { background:rgba(19,20,181,.08); padding:1px 6px; border-radius:3px; font-family:monospace; font-size:11.5px; color:var(--blue); }
+.dismiss { font-size:11px; color:var(--gray); cursor:pointer; text-decoration:underline; margin-top:10px; display:inline-block; }
+
+/* ── STATS ───────────────────────────────────────────────────────────────── */
+.stats-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+.stat-card { background:var(--white); border:1px solid var(--gray-light); border-radius:var(--r-lg); box-shadow:var(--sh-xs); padding:20px 22px; }
+.stat-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--gray); margin-bottom:10px; display:flex; align-items:center; gap:7px; }
+.stat-label svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.75; }
+.stat-value { font-size:34px; font-weight:800; color:var(--dark); letter-spacing:-1.5px; line-height:1; }
+.stat-sub   { font-size:11.5px; color:var(--gray); margin-top:7px; font-weight:500; }
+.type-breakdown { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+.type-row   { display:flex; align-items:center; gap:10px; }
+.type-name  { font-size:12px; color:var(--gray-dark); font-weight:500; flex:0 0 130px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.type-bar-wrap { flex:1; height:5px; background:var(--gray-light); border-radius:99px; overflow:hidden; }
+.type-bar   { height:100%; border-radius:99px; background:var(--dark-blue); transition:width .7s ease; }
+.type-count { font-size:11.5px; font-weight:700; color:var(--gray-dark); min-width:22px; text-align:right; }
+
+/* ── SKELETON ────────────────────────────────────────────────────────────── */
+.sk { background:linear-gradient(90deg,var(--gray-light) 25%,#e8edf2 50%,var(--gray-light) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:4px; display:inline-block; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ── CONTENT COLUMNS ─────────────────────────────────────────────────────── */
+.content-cols { display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start; }
+
+/* ── FILTER CARD ─────────────────────────────────────────────────────────── */
+.filter-card { background:var(--white); border:1px solid var(--gray-light); border-radius:var(--r-lg); box-shadow:var(--sh-xs); padding:18px 20px; margin-bottom:14px; }
+.filter-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:var(--gray); margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+.filter-title::after { content:''; flex:1; height:1px; background:var(--gray-light); }
+.filter-group { margin-bottom:12px; }
+.filter-lbl   { font-size:11px; font-weight:600; color:var(--gray-dark); margin-bottom:5px; }
+.filter-ctrl {
+  width:100%; padding:7px 12px; font-size:12.5px; font-family:var(--font); font-weight:500;
+  color:var(--dark); background:var(--white); border:1.5px solid var(--gray-light);
+  border-radius:var(--r-sm); outline:none; transition:border-color .14s, box-shadow .14s;
+  -webkit-appearance:none; appearance:none;
+}
+select.filter-ctrl {
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%23767A8C' d='M5.5 7.5L1 2h9z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; cursor:pointer;
+}
+.filter-ctrl:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(19,20,181,.09); }
+.filter-ctrl::placeholder { color:var(--gray-light); }
+.btn-clear-all {
+  width:100%; padding:8px; border-radius:var(--r-sm); border:1.5px solid var(--gray-light);
+  background:var(--white); font-size:12px; font-weight:600; font-family:var(--font);
+  color:var(--gray-dark); cursor:pointer; transition:all .14s;
+  display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;
+}
+.btn-clear-all svg { width:11px; height:11px; stroke:currentColor; fill:none; stroke-width:1.75; }
+.btn-clear-all:hover { border-color:var(--gray); color:var(--dark); }
+
+/* ── TABLE CARD ──────────────────────────────────────────────────────────── */
+.table-card { background:var(--white); border:1px solid var(--gray-light); border-radius:var(--r-lg); box-shadow:var(--sh-xs); overflow:hidden; }
+.table-hdr  { padding:14px 20px; border-bottom:1px solid var(--gray-light); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.table-hdr-title { font-size:13px; font-weight:700; color:var(--dark); }
+.table-hdr-count { font-size:11.5px; color:var(--gray); font-weight:500; flex:1; }
+.btn-refresh {
+  display:flex; align-items:center; gap:5px; padding:5px 12px;
+  border-radius:var(--r-xs); border:1.5px solid var(--gray-light);
+  background:var(--white); font-size:11.5px; font-weight:600; font-family:var(--font);
+  color:var(--gray-dark); cursor:pointer; transition:all .14s;
+}
+.btn-refresh svg { width:11px; height:11px; stroke:currentColor; fill:none; stroke-width:1.75; }
+.btn-refresh:hover { background:var(--kit-light); }
+.btn-refresh.spinning svg { animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.doc-table { width:100%; border-collapse:collapse; }
+.doc-table th {
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--gray); padding:10px 16px; text-align:left;
+  background:var(--kit-light); border-bottom:1px solid var(--gray-light); white-space:nowrap;
+}
+.doc-table td { padding:11px 16px; font-size:12.5px; border-bottom:1px solid var(--gray-light); vertical-align:middle; }
+.doc-table tr:last-child td { border-bottom:none; }
+.doc-table tbody tr { transition:background .12s; }
+.doc-table tbody tr:hover { background:var(--kit-light); }
+.doc-num { font-size:11px; color:var(--gray); font-weight:600; }
+
+.doc-ext { width:26px; height:26px; border-radius:4px; font-size:7px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; letter-spacing:.02em; margin-right:8px; vertical-align:middle; }
+.doc-ext.pdf   { background:#FBECe7; color:#8B3216; }
+.doc-ext.doc   { background:var(--light-blue); color:var(--dark-blue); }
+.doc-ext.xls   { background:#E6F4DF; color:#2F6417; }
+.doc-ext.other { background:var(--kit-light); color:var(--gray); }
+.doc-filename  { font-weight:600; color:var(--dark); font-size:12.5px; }
+.doc-sub       { font-size:10.5px; color:var(--gray); margin-top:2px; }
+.doc-sub.party { color:var(--gray-dark); }
+
+.type-badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:10.5px; font-weight:700; white-space:nowrap; }
+.tb-invoice   { background:#EEF2FF; color:#3730A3; }
+.tb-po        { background:#F0FDF4; color:#166534; }
+.tb-stock     { background:#FFF7ED; color:#92400E; }
+.tb-order     { background:#F5F3FF; color:#5B21B6; }
+.tb-financial { background:#FDF2F8; color:#86198F; }
+.tb-contract  { background:#FFF1F2; color:#9F1239; }
+.tb-other     { background:var(--kit-light); color:var(--gray-dark); }
+.dept-badge   { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:600; background:var(--kit-light); color:var(--gray-dark); border:1px solid var(--gray-light); }
+
+.btn-open {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 11px; border-radius:var(--r-xs); border:1.5px solid var(--gray-light);
+  background:var(--white); font-size:11.5px; font-weight:600; font-family:var(--font);
+  color:var(--gray-dark); cursor:pointer; transition:all .14s;
+  text-decoration:none; white-space:nowrap;
+}
+.btn-open svg { width:10px; height:10px; stroke:currentColor; fill:none; stroke-width:1.75; }
+.btn-open:hover { background:var(--light-blue); border-color:rgba(3,54,157,.2); color:var(--dark-blue); }
+
+.table-empty { padding:52px 20px; text-align:center; }
+.table-empty svg { width:32px; height:32px; stroke:var(--gray-light); fill:none; stroke-width:1.4; margin:0 auto 14px; display:block; }
+.table-empty p    { font-size:13px; font-weight:600; color:var(--gray); margin-bottom:5px; }
+.table-empty span { font-size:12px; color:var(--gray-light); }
+
+.pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid var(--gray-light); }
+.page-info  { font-size:12px; color:var(--gray); font-weight:500; }
+.page-btns  { display:flex; gap:5px; }
+.page-btn {
+  padding:5px 11px; border-radius:var(--r-xs); border:1.5px solid var(--gray-light);
+  background:var(--white); font-size:12px; font-weight:600; font-family:var(--font);
+  color:var(--gray-dark); cursor:pointer; transition:all .14s;
+}
+.page-btn:hover:not(:disabled) { background:var(--blue-xl); border-color:rgba(19,20,181,.2); color:var(--blue); }
+.page-btn:disabled { opacity:.35; cursor:not-allowed; }
+.page-btn.current  { background:#14294A; border-color:#14294A; color:#fff; }
+
+/* ── CHAT PANEL ──────────────────────────────────────────────────────────── */
+.chat-panel {
+  background:var(--white); border:1px solid var(--gray-light);
+  border-radius:var(--r-xl); box-shadow:var(--sh-sm);
+  overflow:hidden; display:flex; flex-direction:column;
+  position:sticky; top:78px; max-height:calc(100vh - 100px);
+}
+.chat-topbar { padding:13px 16px; border-bottom:1px solid var(--gray-light); background:var(--kit-light); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.chat-av { width:32px; height:32px; background:#14294A; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.chat-av svg { width:14px; height:14px; stroke:white; fill:none; stroke-width:1.75; }
+.chat-av-name { font-size:12.5px; font-weight:700; color:var(--dark); }
+.chat-av-sub  { font-size:10.5px; color:var(--gray); margin-top:1px; font-weight:500; }
+.chat-online  { display:flex; align-items:center; gap:5px; margin-left:auto; flex-shrink:0; }
+.chat-online-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.chat-online-txt { font-size:10.5px; font-weight:700; color:var(--accent); }
+
+.chat-messages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; min-height:220px; }
+.msg { max-width:86%; padding:9px 12px; border-radius:var(--r); font-size:12.5px; line-height:1.65; word-break:break-word; }
+.msg.bot      { background:var(--kit-light); border:1px solid var(--gray-light); color:var(--dark); align-self:flex-start; border-bottom-left-radius:4px; }
+.msg.user     { background:#14294A; color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+.msg.thinking { color:var(--gray); font-style:italic; font-size:12px; }
+
+.chat-hint { padding:16px; text-align:center; flex-shrink:0; border-top:1px solid var(--gray-light); }
+.chat-hint p    { font-size:12.5px; font-weight:700; color:var(--dark); margin-bottom:4px; }
+.chat-hint span { font-size:11.5px; color:var(--gray); line-height:1.5; display:block; }
+.chat-chips     { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:10px; }
+.chat-chip {
+  font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px;
+  background:var(--kit-light); border:1px solid var(--gray-light);
+  color:var(--gray-dark); cursor:pointer; transition:background .12s, border-color .12s;
+}
+.chat-chip:hover { background:var(--light-blue); border-color:rgba(3,54,157,.18); color:var(--dark-blue); }
+
+.chat-footer { padding:10px 12px; border-top:1px solid var(--gray-light); background:var(--kit-light); flex-shrink:0; }
+.chat-input-row { display:flex; gap:6px; }
+.chat-input {
+  flex:1; padding:8px 12px; font-size:12.5px; font-family:var(--font);
+  color:var(--dark); background:var(--white); border:1.5px solid var(--gray-light);
+  border-radius:var(--r-sm); outline:none; transition:border-color .14s;
+}
+.chat-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(19,20,181,.09); }
+.chat-input::placeholder { color:var(--gray-light); }
+.chat-send {
+  width:34px; height:34px; flex-shrink:0; background:#14294A; border:none;
+  border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background .14s;
+}
+.chat-send:hover { background:var(--dark-blue); }
+.chat-send svg { width:12px; height:12px; stroke:white; fill:none; stroke-width:2; }
+.chat-meta { font-size:10px; color:var(--gray); margin-top:6px; text-align:center; }
+
+/* ── MOBILE ──────────────────────────────────────────────────────────────── */
+@media(max-width:880px) {
+  .content-cols { grid-template-columns:1fr; }
+  .chat-panel   { position:static; max-height:480px; }
+  .page-wrap, .topbar-inner { padding-left:18px; padding-right:18px; }
+  .logo-tag, .topbar-sep    { display:none; }
+  .stats-row  { grid-template-columns:1fr; }
+  .page-hero  { flex-direction:column; align-items:flex-start; gap:12px; padding:28px 0 18px; }
+  .doc-table th:nth-child(4), .doc-table td:nth-child(4) { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!--
+=============================================================================
+  SHAREPOINT SETUP — read this once, then paste your flow URL below
+  ─────────────────────────────────────────────────────────────────────────
+  1. In Power Automate create an Instant cloud flow with HTTP Request trigger.
+  2. Add "Get files (properties only)" action:
+       Site Address : https://raheelmstratagemconsults.sharepoint.com/sites/DocumentIntelligenceProjectSite
+       Library Name : Shared Documents
+       Folder       : Test_FR
+  3. Add a "Select" action — map each item:
+       {
+         "name"        : @{items('Apply_to_each')?['FileLeafRef']},
+         "docType"     : @{items('Apply_to_each')?['DocumentType']},
+         "department"  : @{items('Apply_to_each')?['Department']},
+         "relatedParty": @{items('Apply_to_each')?['RelatedParty']},
+         "category"    : @{items('Apply_to_each')?['Category']},
+         "uploadedBy"  : @{items('Apply_to_each')?['UploadedBy']},
+         "webUrl"      : @{items('Apply_to_each')?['{Link}']},
+         "modified"    : @{items('Apply_to_each')?['Modified']}
+       }
+  4. Add "Response" action:
+       Status Code : 200
+       Body        : @{outputs('Select')}
+       Headers     : Content-Type → application/json
+  5. Copy the HTTP POST URL → paste into SHAREPOINT_FLOW_URL below.
+=============================================================================
+-->
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+          <line x1="9" y1="17" x2="12" y2="17"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">Aria</span>
+        <span class="logo-tag">AI Document Analyst</span>
+      </div>
+    </a>
+
+    <div class="topbar-sep"></div>
+
+    <nav class="nav">
+      <a class="nav-link" href="index.html">
+        <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        Upload
+      </a>
+      <a class="nav-link active" href="dashboard.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+    </nav>
+
+    <div class="topbar-right">Group 6 Traders</div>
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <div class="page-hero">
+    <div>
+      <h1>Document Dashboard</h1>
+      <p>Browse, search, and filter all indexed documents from the SharePoint knowledge base.</p>
+    </div>
+    <div class="online-badge">
+      <div class="online-dot"></div>
+      <span class="online-text">System online</span>
+    </div>
+  </div>
+
+  <!-- Setup notice -->
+  <div class="setup-notice" id="setupNotice">
+    <h3>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+      SharePoint flow not yet connected
+    </h3>
+    <ol>
+      <li>Create a Power Automate HTTP-triggered flow that reads your SharePoint <code>Test_FR</code> folder and returns JSON (see HTML comments at top for full step-by-step).</li>
+      <li>Paste the HTTP trigger POST URL into <code>SHAREPOINT_FLOW_URL</code> at the top of the &lt;script&gt; block.</li>
+      <li>The dashboard will then load and refresh live documents from SharePoint automatically.</li>
+    </ol>
+    <span class="dismiss" id="dismissSetup">Dismiss — use demo data for now</span>
+  </div>
+
+  <!-- Error banner -->
+  <div class="alert error" id="alertError">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+    <span id="alertMsg">Could not reach SharePoint. Showing demo data.</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Total Documents
+      </div>
+      <div class="stat-value" id="statTotal"><span class="sk" style="width:52px;height:34px;display:inline-block">&nbsp;</span></div>
+      <div class="stat-sub" id="statSub"><span class="sk" style="width:140px;height:12px">&nbsp;</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Document Types
+      </div>
+      <div class="type-breakdown" id="typeBreakdown">
+        <div class="type-row"><span class="sk" style="width:100%;height:12px;display:block">&nbsp;</span></div>
+        <div class="type-row"><span class="sk" style="width:75%;height:12px;display:block">&nbsp;</span></div>
+        <div class="type-row"><span class="sk" style="width:50%;height:12px;display:block">&nbsp;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-cols">
+
+    <!-- LEFT -->
+    <div>
+      <div class="filter-card">
+        <div class="filter-title">Filters</div>
+        <div class="filter-group">
+          <div class="filter-lbl">Search</div>
+          <input class="filter-ctrl" id="searchInput" type="text" placeholder="Search filename, related party…">
+        </div>
+        <div class="filter-group">
+          <div class="filter-lbl">Document Type</div>
+          <select class="filter-ctrl" id="filterType">
+            <option value="">All Types</option>
+            <option>Invoice</option>
+            <option>Purchase Order</option>
+            <option>Stock Report</option>
+            <option>Order</option>
+            <option>Financial Report</option>
+            <option>Contract</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-lbl">Stock Category</div>
+          <select class="filter-ctrl" id="filterCategory">
+            <option value="">All Categories</option>
+            <option>All Categories</option>
+            <option>Beverages</option>
+            <option>Condiments</option>
+            <option>Confections</option>
+            <option>Dairy Products</option>
+            <option>Grains/Cereals</option>
+            <option>Meat/Poultry</option>
+            <option>Produce</option>
+            <option>Seafood</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-lbl">Department</div>
+          <select class="filter-ctrl" id="filterDept">
+            <option value="">All Departments</option>
+            <option>Finance</option>
+            <option>Operations</option>
+            <option>Marketing</option>
+            <option>Sales</option>
+            <option>IT</option>
+            <option>Executive</option>
+          </select>
+        </div>
+        <button class="btn-clear-all" id="btnClearFilters">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          Clear filters
+        </button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-hdr">
+          <span class="table-hdr-title">Documents</span>
+          <span class="table-hdr-count" id="tableCount">—</span>
+          <button class="btn-refresh" id="btnRefresh">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <table class="doc-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Document</th>
+              <th>Type</th>
+              <th>Department</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="docTableBody"></tbody>
+        </table>
+
+        <div class="table-empty" id="tableEmpty" style="display:none">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <p>No documents found</p>
+          <span>Try adjusting your filters</span>
+        </div>
+
+        <div class="pagination" id="pagination" style="display:none">
+          <span class="page-info" id="pageInfo"></span>
+          <div class="page-btns" id="pageBtns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: AI chat -->
+    <div>
+      <div class="chat-panel">
+        <div class="chat-topbar">
+          <div class="chat-av">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div>
+            <div class="chat-av-name">Aria AI</div>
+            <div class="chat-av-sub">Powered by Azure AI Foundry</div>
+          </div>
+          <div class="chat-online">
+            <div class="chat-online-dot"></div>
+            <span class="chat-online-txt">Online</span>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-hint" id="chatHint">
+          <p>Ask about your documents</p>
+          <span>I can search, summarise, and answer questions about any document in your knowledge base.</span>
+          <div class="chat-chips">
+            <span class="chat-chip" data-msg="How many documents have been uploaded?">Total uploads</span>
+            <span class="chat-chip" data-msg="Which document types are most common?">By type</span>
+            <span class="chat-chip" data-msg="Show me all invoices">All invoices</span>
+            <span class="chat-chip" data-msg="Are there any stock reports for Beverages?">Stock by category</span>
+          </div>
+        </div>
+
+        <div class="chat-footer">
+          <div class="chat-input-row">
+            <input class="chat-input" id="chatInput" type="text" placeholder="Ask about your documents…">
+            <button class="chat-send" id="chatSend">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="chat-meta">Press Enter to send · Shift+Enter for new line</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════════════════════════════════════ */
+const SHAREPOINT_FLOW_URL = '';  // ← paste your Power Automate HTTP POST URL here
+
+const SP_FOLDER_URL = 'https://raheelmstratagemconsults.sharepoint.com/sites/DocumentIntelligenceProjectSite/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FDocumentIntelligenceProjectSite%2FShared%20Documents%2FTest_FR&viewid=ab915f6e-74f0-45cf-9f66-19a4e52a39b6';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DEMO FALLBACK DATA
+   ═══════════════════════════════════════════════════════════════════════ */
+const DEMO_DOCS = [
+  { name:'Invoice_INV-2024-0041.pdf',          docType:'Invoice',          department:'Finance',    relatedParty:'Acme Supplies Ltd',   category:'', webUrl:'' },
+  { name:'Purchase_Orders_PO-8821.pdf',        docType:'Purchase Order',   department:'Operations', relatedParty:'BlueWave Trading',    category:'', webUrl:'' },
+  { name:'StockReport_2024-Q3-Beverages.xlsx', docType:'Stock Report',     department:'Operations', relatedParty:'',                   category:'Beverages', webUrl:'' },
+  { name:'Invoice_INV-2024-0039.pdf',          docType:'Invoice',          department:'Finance',    relatedParty:'Sunrise Foods Co.',   category:'', webUrl:'' },
+  { name:'Contract_SLA-Logistics-2024.docx',   docType:'Contract',         department:'Executive',  relatedParty:'FastTrack Logistics', category:'', webUrl:'' },
+  { name:'StockReport_2024-Q3-Seafood.xlsx',   docType:'Stock Report',     department:'Operations', relatedParty:'',                   category:'Seafood', webUrl:'' },
+  { name:'Purchase_Orders_PO-8799.pdf',        docType:'Purchase Order',   department:'Finance',    relatedParty:'Metro Wholesale Ltd', category:'', webUrl:'' },
+  { name:'Invoice_INV-2024-0038.pdf',          docType:'Invoice',          department:'Finance',    relatedParty:'Acme Supplies Ltd',   category:'', webUrl:'' },
+  { name:'Order_ORD-4421.pdf',                 docType:'Order',            department:'Sales',      relatedParty:'Delta Retail Group',  category:'', webUrl:'' },
+  { name:'FinancialReport_Q2-2024.xlsx',       docType:'Financial Report', department:'Finance',    relatedParty:'',                   category:'', webUrl:'' },
+  { name:'StockReport_2024-Q3-Produce.xlsx',   docType:'Stock Report',     department:'Operations', relatedParty:'',                   category:'Produce', webUrl:'' },
+  { name:'Invoice_INV-2024-0035.pdf',          docType:'Invoice',          department:'Finance',    relatedParty:'Sunrise Foods Co.',   category:'', webUrl:'' },
+];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════════════ */
+const PAGE_SIZE = 8;
+let allDocs     = [];
+let filtered    = [];
+let currentPage = 1;
+let chatHistory = [];
+
+/* ─── UTILS ─────────────────────────────────────────────────────────── */
+function extClass(name) {
+  const e = (name || '').split('.').pop().toLowerCase();
+  return e === 'pdf' ? 'pdf' : ['doc','docx'].includes(e) ? 'doc' : ['xls','xlsx'].includes(e) ? 'xls' : 'other';
+}
+function typeBadgeClass(type) {
+  const m = { 'Invoice':'tb-invoice','Purchase Order':'tb-po','Stock Report':'tb-stock','Order':'tb-order','Financial Report':'tb-financial','Contract':'tb-contract' };
+  return m[type] || 'tb-other';
+}
+function inferType(name) {
+  const n = (name || '').toLowerCase();
+  if (n.startsWith('invoice_'))         return 'Invoice';
+  if (n.startsWith('purchase_orders_')) return 'Purchase Order';
+  if (n.startsWith('stockreport_'))     return 'Stock Report';
+  if (n.startsWith('order_'))           return 'Order';
+  if (n.startsWith('financialreport_')) return 'Financial Report';
+  if (n.startsWith('contract_'))        return 'Contract';
+  return 'Other';
+}
+
+/* ─── FETCH ──────────────────────────────────────────────────────────── */
+async function fetchDocs() {
+  setRefreshing(true);
+  hideAlert();
+
+  if (!SHAREPOINT_FLOW_URL) {
+    allDocs = DEMO_DOCS.map((d, i) => ({ ...d, id: i }));
+    afterLoad();
+    return;
+  }
+
+  try {
+    const res  = await fetch(SHAREPOINT_FLOW_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const raw  = await res.json();
+    const items = Array.isArray(raw) ? raw : (raw.value || []);
+
+    allDocs = items.map((item, i) => ({
+      id:          i,
+      name:        item.name         || item.FileLeafRef   || '',
+      docType:     item.docType      || item.DocumentType  || inferType(item.name || item.FileLeafRef),
+      department:  item.department   || item.Department    || '',
+      relatedParty:item.relatedParty || item.RelatedParty  || '',
+      category:    item.category     || item.Category      || '',
+      uploadedBy:  item.uploadedBy   || item.UploadedBy    || '',
+      webUrl:      item.webUrl       || item['{Link}']     || '',
+      modified:    item.modified     || item.Modified      || '',
+    }));
+  } catch (err) {
+    console.error('SharePoint fetch failed:', err);
+    allDocs = DEMO_DOCS.map((d, i) => ({ ...d, id: i }));
+    showAlert('Could not reach SharePoint (' + err.message + '). Showing demo data.');
+  }
+
+  afterLoad();
+}
+
+function afterLoad() {
+  renderStats(allDocs);
+  applyFilters();
+  setRefreshing(false);
+}
+
+function setRefreshing(on) {
+  document.getElementById('btnRefresh').classList.toggle('spinning', on);
+}
+function showAlert(msg) {
+  const el = document.getElementById('alertError');
+  document.getElementById('alertMsg').textContent = msg;
+  el.style.display = 'flex';
+}
+function hideAlert() {
+  document.getElementById('alertError').style.display = 'none';
+}
+
+/* ─── STATS ──────────────────────────────────────────────────────────── */
+function renderStats(docs) {
+  document.getElementById('statTotal').textContent = docs.length;
+  const depts = [...new Set(docs.map(d => d.department).filter(Boolean))].length;
+  document.getElementById('statSub').textContent = 'Across ' + (depts || '—') + ' department(s)';
+
+  const counts = {};
+  docs.forEach(d => { const t = d.docType || 'Unknown'; counts[t] = (counts[t] || 0) + 1; });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const max = sorted[0]?.[1] || 1;
+
+  document.getElementById('typeBreakdown').innerHTML = sorted.length
+    ? sorted.map(([type, n]) =>
+        '<div class="type-row">' +
+          '<span class="type-name">' + type + '</span>' +
+          '<div class="type-bar-wrap"><div class="type-bar" style="width:' + Math.round(n / max * 100) + '%"></div></div>' +
+          '<span class="type-count">' + n + '</span>' +
+        '</div>'
+      ).join('')
+    : '<span style="font-size:12px;color:var(--gray)">No data</span>';
+}
+
+/* ─── TABLE ──────────────────────────────────────────────────────────── */
+function applyFilters() {
+  const q    = document.getElementById('searchInput').value.toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const cat  = document.getElementById('filterCategory').value;
+  const dept = document.getElementById('filterDept').value;
+
+  filtered = allDocs.filter(d => {
+    if (q    && !d.name.toLowerCase().includes(q) && !(d.relatedParty || '').toLowerCase().includes(q)) return false;
+    if (type && d.docType    !== type) return false;
+    if (cat  && d.category   !== cat)  return false;
+    if (dept && d.department !== dept) return false;
+    return true;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('docTableBody');
+  const empty = document.getElementById('tableEmpty');
+  const pag   = document.getElementById('pagination');
+
+  document.getElementById('tableCount').textContent = filtered.length + ' result' + (filtered.length !== 1 ? 's' : '');
+
+  if (!filtered.length) {
+    tbody.innerHTML    = '';
+    empty.style.display = 'block';
+    pag.style.display   = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page  = filtered.slice(start, start + PAGE_SIZE);
+
+  tbody.innerHTML = page.map((doc, i) => {
+    const ext      = extClass(doc.name);
+    const badge    = typeBadgeClass(doc.docType);
+    // Build file URL: use webUrl from flow if available, otherwise deep-link into the SP folder
+    const fileUrl  = doc.webUrl
+      ? doc.webUrl
+      : 'https://raheelmstratagemconsults.sharepoint.com/sites/DocumentIntelligenceProjectSite/Shared%20Documents/Test_FR/' + encodeURIComponent(doc.name);
+
+    return '<tr>' +
+      '<td><span class="doc-num">' + (start + i + 1) + '</span></td>' +
+      '<td>' +
+        '<div style="display:flex;align-items:flex-start;gap:0">' +
+          '<span class="doc-ext ' + ext + '" style="margin-top:2px">' + ext.toUpperCase().slice(0, 3) + '</span>' +
+          '<div>' +
+            '<div class="doc-filename">' + doc.name + '</div>' +
+            (doc.category    ? '<div class="doc-sub">📦 ' + doc.category + '</div>'               : '') +
+            (doc.relatedParty? '<div class="doc-sub party">' + doc.relatedParty + '</div>'         : '') +
+            (doc.uploadedBy  ? '<div class="doc-sub" style="color:var(--gray-light)">↑ ' + doc.uploadedBy + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+      '</td>' +
+      '<td><span class="type-badge ' + badge + '">' + (doc.docType || 'Unknown') + '</span></td>' +
+      '<td>' + (doc.department ? '<span class="dept-badge">' + doc.department + '</span>' : '<span style="color:var(--gray-light)">—</span>') + '</td>' +
+      '<td>' +
+        '<button class="btn-open" onclick="askAria(' + JSON.stringify(doc.name) + ',' + JSON.stringify(doc.docType||'') + ',' + JSON.stringify(doc.relatedParty||'') + ')">' +
+          '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
+          'Ask Aria' +
+        '</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (totalPages <= 1) { pag.style.display = 'none'; return; }
+  pag.style.display = 'flex';
+  document.getElementById('pageInfo').textContent = 'Page ' + currentPage + ' of ' + totalPages;
+
+  let html = '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>← Prev</button>';
+  for (let p = 1; p <= totalPages; p++) {
+    html += '<button class="page-btn' + (p === currentPage ? ' current' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+  }
+  html += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>Next →</button>';
+  document.getElementById('pageBtns').innerHTML = html;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  renderTable();
+  document.querySelector('.table-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ─── FILTER EVENTS ──────────────────────────────────────────────────── */
+['searchInput','filterType','filterCategory','filterDept'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', applyFilters);
+});
+document.getElementById('btnClearFilters').addEventListener('click', function() {
+  ['searchInput','filterType','filterCategory','filterDept'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+  applyFilters();
+});
+document.getElementById('btnRefresh').addEventListener('click', fetchDocs);
+document.getElementById('dismissSetup').addEventListener('click', function() {
+  document.getElementById('setupNotice').style.display = 'none';
+});
+
+
+/* ─── ASK ARIA ───────────────────────────────────────────────────── */
+function askAria(name, docType, relatedParty) {
+  var parts = ['Tell me about this document: "' + name + '"'];
+  if (docType)      parts.push('Type: ' + docType);
+  if (relatedParty) parts.push('Related party: ' + relatedParty);
+  document.querySelector('.chat-panel').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  setTimeout(function() { sendChat(parts.join(' | ')); }, 150);
+}
+
+/* ─── CHAT ───────────────────────────────────────────────────────────── */
+function appendMsg(role, text) {
+  document.getElementById('chatHint').style.display = 'none';
+  var msgs = document.getElementById('chatMessages');
+  var div  = document.createElement('div');
+  div.className   = 'msg ' + role;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop  = msgs.scrollHeight;
+  return div;
+}
+
+async function sendChat(text) {
+  if (!text.trim()) return;
+  var input   = document.getElementById('chatInput');
+  var sendBtn = document.getElementById('chatSend');
+  input.value    = '';
+  input.disabled = sendBtn.disabled = true;
+
+  appendMsg('user', text);
+  var thinking = appendMsg('bot thinking', 'Aria is thinking…');
+  chatHistory.push({ role:'user', content: text });
+
+  var docSummary = allDocs.length
+    ? allDocs.map(function(d) {
+        return '- "' + d.name + '" | Type: ' + (d.docType||'?') + ' | Dept: ' + (d.department||'?') +
+          (d.relatedParty ? ' | Party: ' + d.relatedParty : '') +
+          (d.category     ? ' | Category: ' + d.category  : '');
+      }).join('\n')
+    : 'No documents loaded yet.';
+
+  var system = 'You are Aria, an AI Document Analyst for Group 6 Traders. You have access to the following document index (' + allDocs.length + ' document' + (allDocs.length !== 1 ? 's' : '') + '):\n\n' + docSummary + '\n\nAnswer questions about these documents accurately and concisely. Reference actual filenames and metadata when relevant. Tell the user they can click the "Ask Aria" button next to any document row to ask about that file. Be professional and brief.';
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:    'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system:   system,
+        messages: chatHistory
+      })
+    });
+    var data  = await resp.json();
+    var reply = (data.content || []).map(function(b) { return b.text || ''; }).join('') || "Sorry, I couldn't get a response.";
+    thinking.remove();
+    appendMsg('bot', reply);
+    chatHistory.push({ role:'assistant', content: reply });
+  } catch(err) {
+    thinking.remove();
+    appendMsg('bot', 'Connection error — please try again.');
+    chatHistory.pop();
+  }
+
+  input.disabled = sendBtn.disabled = false;
+  input.focus();
+}
+
+document.getElementById('chatSend').addEventListener('click', function() {
+  sendChat(document.getElementById('chatInput').value);
+});
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(e.target.value); }
+});
+document.querySelectorAll('.chat-chip').forEach(function(c) {
+  c.addEventListener('click', function() { sendChat(c.dataset.msg); });
+});
+
+/* ─── INIT ───────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  if (SHAREPOINT_FLOW_URL) {
+    document.getElementById('setupNotice').style.display = 'none';
+  }
+  fetchDocs();
+});
+</script>
+</body>
+</html>
