@@ -4,14 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aria — AI Document Analyst</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ── TOKENS (style guide palette) ───────────────────────────────────────── */
+/* ── TOKENS ──────────────────────────────────────────────────────────────── */
 :root {
-  --font:         'Plus Jakarta Sans', sans-serif;
-  --font-display: 'Playfair Display', serif;
-
-  /* Kit colours */
+  --font:       'Plus Jakarta Sans', sans-serif;
   --blue:       #1314B5;
   --dark-blue:  #03369D;
   --light-blue: #DFE9FF;
@@ -21,380 +18,215 @@
   --dark:       #131415;
   --kit-light:  #F2F4F7;
   --white:      #FFFFFF;
-
-  /* Functional */
-  --accent:       #1A9B72;
-  --accent-light: #E2F5EE;
-  --red:          #B33030;
-  --red-light:    #FCEAEA;
-  --blue-xlight:  #EEF2FF;
-
-  /* Radius */
-  --r-xs: 6px;  --r-sm: 8px;  --r: 12px;  --r-lg: 16px;  --r-xl: 20px;
-
-  /* Shadows */
+  --accent:     #1A9B72;
+  --accent-lt:  #E2F5EE;
+  --red:        #B33030;
+  --red-lt:     #FCEAEA;
+  --blue-xl:    #EEF2FF;
+  --r-xs:4px; --r-sm:8px; --r:12px; --r-lg:16px; --r-xl:20px;
   --sh-xs: 0 1px 2px rgba(3,54,157,.07);
   --sh-sm: 0 1px 5px rgba(3,54,157,.10);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--kit-light);color:var(--dark);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-/* ── RESET ───────────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: var(--font);
-  background: var(--kit-light);
-  color: var(--dark);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
-
-/* ── TOP BAR ─────────────────────────────────────────────────────────────── */
-.topbar {
-  background: var(--dark-blue);
-  border-bottom: 1px solid rgba(255,255,255,.10);
-  position: sticky; top: 0; z-index: 100;
-}
-.topbar-inner {
-  max-width: 960px; margin: 0 auto;
-  padding: 0 32px; height: 62px;
-  display: flex; align-items: center; gap: 20px;
-}
-
-/* Logo */
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
-.logo-mark {
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.logo-mark svg { width: 32px; height: 32px; stroke: #DFE9FF; fill: none; stroke-width: 1.5; }
-.logo-text { display: flex; flex-direction: column; line-height: 1; }
-.logo-name {
-  font-family: var(--font);
-  font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -.2px;
-}
-.logo-tag {
-  font-family: var(--font);
-  font-size: 8.5px; font-weight: 600;
-  color: rgba(255,255,255,.82);
-  letter-spacing: .22em; text-transform: uppercase; margin-top: 5px;
-}
-
-/* Divider */
-.topbar-sep { width: 1px; height: 26px; background: rgba(255,255,255,.14); flex-shrink: 0; }
-
-/* Nav */
-.nav { display: flex; align-items: stretch; height: 62px; }
-.nav-btn {
-  display: flex; align-items: center; gap: 7px;
-  padding: 0 22px;
-  border: none; background: none;
-  font-family: var(--font); font-size: 13px; font-weight: 600;
-  color: rgba(255,255,255,.52); letter-spacing: .01em;
-  cursor: pointer;
-  border-bottom: 2.5px solid transparent;
-  transition: color .14s, border-color .14s, background .14s;
-  white-space: nowrap;
-}
-.nav-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.75; flex-shrink: 0; }
-.nav-btn:hover { color: rgba(255,255,255,.84); background: rgba(255,255,255,.05); }
-.nav-btn.active { color: #fff; border-bottom-color: var(--light-blue); }
-.nav-badge {
-  font-size: 9px; font-weight: 700; letter-spacing: .04em;
-  background: rgba(223,233,255,.14); color: rgba(255,255,255,.52);
-  border: 1px solid rgba(223,233,255,.20);
-  padding: 2px 7px; border-radius: 20px;
-}
+/* ── TOPBAR ──────────────────────────────────────────────────────────────── */
+.topbar{background:#14294A;border-bottom:1px solid rgba(255,255,255,.10);position:sticky;top:0;z-index:100}
+.topbar-inner{max-width:980px;margin:0 auto;padding:0 32px;height:62px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.logo-mark{display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:32px;height:32px;stroke:#DFE9FF;fill:none;stroke-width:1.5}
+.logo-text{display:flex;flex-direction:column;line-height:1}
+.logo-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.2px}
+.logo-tag{font-size:8.5px;font-weight:600;color:rgba(255,255,255,.82);letter-spacing:.22em;text-transform:uppercase;margin-top:5px}
+.topbar-sep{width:1px;height:26px;background:rgba(255,255,255,.14);flex-shrink:0}
+.topbar-right{margin-left:auto;font-size:12px;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.01em}
+.nav{display:flex;align-items:stretch;height:62px}
+.nav-btn{display:flex;align-items:center;gap:7px;padding:0 22px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:600;color:rgba(255,255,255,.52);letter-spacing:.01em;cursor:pointer;border-bottom:2.5px solid transparent;transition:color .14s,border-color .14s,background .14s;white-space:nowrap}
+.nav-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.75;flex-shrink:0}
+.nav-btn:hover{color:rgba(255,255,255,.84);background:rgba(255,255,255,.05)}
+.nav-btn.active{color:#fff;border-bottom-color:var(--light-blue)}
+.nav-badge{font-size:9px;font-weight:700;letter-spacing:.04em;background:rgba(223,233,255,.14);color:rgba(255,255,255,.52);border:1px solid rgba(223,233,255,.20);padding:2px 7px;border-radius:20px}
 
 /* ── BODY ────────────────────────────────────────────────────────────────── */
-.body-wrap { max-width: 960px; margin: 0 auto; padding: 0 32px 80px; width: 100%; }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
+.body-wrap{max-width:980px;margin:0 auto;padding:0 32px 80px;width:100%}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
 /* ── PAGE HERO ───────────────────────────────────────────────────────────── */
-.page-hero {
-  padding: 48px 0 28px;
-  border-bottom: 1px solid var(--gray-light);
-  margin-bottom: 32px;
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
-}
-.page-hero h1 {
-  font-size: 28px; font-weight: 700; color: var(--dark);
-  letter-spacing: -.5px; line-height: 1.2; margin-bottom: 8px;
-}
-.page-hero p { font-size: 13.5px; color: var(--gray); line-height: 1.7; max-width: 440px; }
-
-.online-badge {
-  display: flex; align-items: center; gap: 7px;
-  background: var(--accent-light); border: 1px solid rgba(26,155,114,.2);
-  border-radius: 20px; padding: 5px 13px 5px 9px; flex-shrink: 0;
-}
-.online-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(26,155,114,.45); }
-  50%      { box-shadow: 0 0 0 5px rgba(26,155,114,.0); }
-}
-.online-text { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+.page-hero{padding:48px 0 28px;border-bottom:1px solid var(--gray-light);margin-bottom:32px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.page-hero h1{font-size:28px;font-weight:700;color:var(--dark);letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.page-hero p{font-size:13.5px;color:var(--gray);line-height:1.7;max-width:440px}
+.online-badge{display:flex;align-items:center;gap:7px;background:var(--accent-lt);border:1px solid rgba(26,155,114,.2);border-radius:20px;padding:5px 13px 5px 9px;flex-shrink:0}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(26,155,114,.45)}50%{box-shadow:0 0 0 5px rgba(26,155,114,0)}}
+.online-text{font-size:11.5px;font-weight:700;color:var(--accent)}
 
 /* ── BANNERS ─────────────────────────────────────────────────────────────── */
-.banner {
-  display: none; align-items: center; gap: 10px;
-  padding: 12px 16px; border-radius: var(--r-sm);
-  font-size: 13px; font-weight: 500; margin-bottom: 18px;
-}
-.banner svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; flex-shrink: 0; }
-.banner.success { background: var(--accent-light); border: 1px solid rgba(26,155,114,.25); color: #0B6E4F; }
-.banner.error   { background: var(--red-light);    border: 1px solid rgba(179,48,48,.22);  color: var(--red); }
-@keyframes bIn  { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:none; } }
-@keyframes bOut { from { opacity:1; } to { opacity:0; transform:translateY(-5px); } }
+.banner{display:none;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:500;margin-bottom:18px}
+.banner svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.75;flex-shrink:0}
+.banner.success{background:var(--accent-lt);border:1px solid rgba(26,155,114,.25);color:#0B6E4F}
+.banner.error{background:var(--red-lt);border:1px solid rgba(179,48,48,.22);color:var(--red)}
+@keyframes bIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@keyframes bOut{from{opacity:1}to{opacity:0;transform:translateY(-5px)}}
 
 /* ── PROGRESS ────────────────────────────────────────────────────────────── */
-.progress-wrap { display: none; margin-bottom: 18px; }
-.progress-track { height: 3px; background: var(--gray-light); border-radius: 99px; overflow: hidden; }
-.progress-fill  { height: 100%; background: var(--blue); border-radius: 99px; transition: width .3s ease; width: 0%; }
-.progress-lbl   { font-size: 11px; color: var(--gray); margin-top: 7px; text-align: center; font-weight: 500; }
+.progress-wrap{display:none;margin-bottom:18px}
+.progress-track{height:3px;background:var(--gray-light);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:var(--blue);border-radius:99px;transition:width .3s ease;width:0%}
+.progress-lbl{font-size:11px;color:var(--gray);margin-top:7px;text-align:center;font-weight:500}
 
 /* ── CARD ────────────────────────────────────────────────────────────────── */
-.card {
-  background: var(--white);
-  border: 1px solid var(--gray-light);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-sm);
-  overflow: hidden; margin-bottom: 18px;
-}
-.card-section { padding: 26px 30px; border-bottom: 1px solid var(--gray-light); }
-.card-section:last-child { border-bottom: none; }
-
-.slabel {
-  font-size: 10px; font-weight: 700; color: var(--gray);
-  text-transform: uppercase; letter-spacing: .12em;
-  margin-bottom: 18px;
-  display: flex; align-items: center; gap: 10px;
-}
-.slabel::after { content: ''; flex: 1; height: 1px; background: var(--gray-light); }
-.req { color: #C53030; margin-left: 1px; }
+.card{background:var(--white);border:1px solid var(--gray-light);border-radius:var(--r-xl);box-shadow:var(--sh-sm);overflow:hidden;margin-bottom:18px}
+.card-section{padding:26px 30px;border-bottom:1px solid var(--gray-light)}
+.card-section:last-child{border-bottom:none}
+.slabel{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--gray-light)}
+.req{color:#C53030;margin-left:1px}
 
 /* ── DROP ZONE ───────────────────────────────────────────────────────────── */
-.drop-zone {
-  border: 1.5px dashed var(--gray-light);
-  border-radius: var(--r); padding: 40px 24px;
-  text-align: center; cursor: pointer;
-  transition: border-color .18s, background .18s;
-  background: var(--kit-light);
-}
-.drop-zone:hover, .drop-zone.drag-over { border-color: var(--blue); background: var(--blue-xlight); }
-.dz-icon {
-  width: 46px; height: 46px;
-  background: var(--white); border: 1px solid var(--gray-light);
-  border-radius: var(--r); box-shadow: var(--sh-xs);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px;
-}
-.dz-icon svg { width: 20px; height: 20px; stroke: var(--blue); fill: none; stroke-width: 1.6; }
-.drop-zone h3 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 5px; }
-.drop-zone p  { font-size: 12.5px; color: var(--gray); }
-.browse { color: var(--blue); font-weight: 700; text-decoration: underline; cursor: pointer; }
-.ftype-row { display: flex; gap: 5px; justify-content: center; margin-top: 14px; }
-.ftag {
-  font-size: 10px; font-weight: 600;
-  padding: 2px 9px; border-radius: 20px;
-  background: var(--white); color: var(--gray); border: 1px solid var(--gray-light);
-}
+.drop-zone{border:1.5px dashed var(--gray-light);border-radius:var(--r);padding:40px 24px;text-align:center;cursor:pointer;transition:border-color .18s,background .18s;background:var(--kit-light)}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--blue);background:var(--blue-xl)}
+.dz-icon{width:46px;height:46px;background:var(--white);border:1px solid var(--gray-light);border-radius:var(--r);box-shadow:var(--sh-xs);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.dz-icon svg{width:20px;height:20px;stroke:var(--blue);fill:none;stroke-width:1.6}
+.drop-zone h3{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:5px}
+.drop-zone p{font-size:12.5px;color:var(--gray)}
+.browse{color:var(--blue);font-weight:700;text-decoration:underline;cursor:pointer}
+.ftype-row{display:flex;gap:5px;justify-content:center;margin-top:14px}
+.ftag{font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--white);color:var(--gray);border:1px solid var(--gray-light)}
 
 /* ── FILE LIST ───────────────────────────────────────────────────────────── */
-.file-list { display: none; flex-direction: column; gap: 6px; margin-top: 12px; }
-.file-row  { display: flex; align-items: center; gap: 8px; }
-.file-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 7px 11px;
-  background: var(--white); border: 1px solid var(--gray-light);
-  border-radius: var(--r-sm); box-shadow: var(--sh-xs);
-  flex: 0 1 55%; min-width: 0;
-}
-.file-item-main { display: contents; }
-.fext {
-  width: 30px; height: 30px; border-radius: var(--r-xs);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 8px; font-weight: 800; flex-shrink: 0; letter-spacing: .02em;
-}
-.fext.pdf   { background: #FBECe7; color: #8B3216; }
-.fext.doc   { background: var(--light-blue); color: var(--dark-blue); }
-.fext.xls   { background: #E6F4DF; color: #2F6417; }
-.fext.other { background: var(--kit-light); color: var(--gray); }
-.fname {
-  font-size: 12px; font-weight: 500; color: var(--dark);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1; min-width: 0;
-}
-.fsize { font-size: 11px; color: var(--gray); flex-shrink: 0; font-weight: 500; }
-.frm {
-  width: 20px; height: 20px; border: none; background: none;
-  cursor: pointer; color: var(--gray-light);
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 4px; transition: all .14s; flex-shrink: 0;
-}
-.frm:hover { background: var(--red-light); color: var(--red); }
+.file-list{display:none;flex-direction:column;gap:8px;margin-top:14px}
+.file-row{display:flex;flex-direction:column;gap:0;background:var(--white);border:1px solid var(--gray-light);border-radius:var(--r-sm);box-shadow:var(--sh-xs);overflow:hidden}
+.file-item-main{display:flex;align-items:center;gap:9px;padding:8px 12px}
+.fext{width:30px;height:30px;border-radius:var(--r-xs);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;flex-shrink:0;letter-spacing:.02em}
+.fext.pdf{background:#FBECe7;color:#8B3216}
+.fext.doc{background:var(--light-blue);color:var(--dark-blue)}
+.fext.xls{background:#E6F4DF;color:#2F6417}
+.fext.other{background:var(--kit-light);color:var(--gray)}
+.fname{font-size:12px;font-weight:500;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.fsize{font-size:11px;color:var(--gray);flex-shrink:0;font-weight:500}
+.frm{width:20px;height:20px;border:none;background:none;cursor:pointer;color:var(--gray-light);display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .14s;flex-shrink:0}
+.frm:hover{background:var(--red-lt);color:var(--red)}
 
-.file-cat-select {
-  flex: 1; min-width: 0; height: 34px;
-  padding: 0 28px 0 11px;
-  font-size: 12px; font-weight: 500; font-family: var(--font); color: var(--gray-dark);
-  background-color: var(--light-blue);
-  border: 1.5px solid rgba(3,54,157,.18);
-  border-radius: var(--r-sm);
-  outline: none; cursor: pointer;
-  -webkit-appearance: none; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2303369D' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 9px center; background-size: 9px;
-  transition: border-color .14s, box-shadow .14s;
+/* file inline selects row */
+.file-meta-row{display:flex;gap:6px;padding:0 12px 9px;flex-wrap:wrap}
+.file-meta-row .file-sel{
+  flex:1;min-width:140px;height:30px;
+  padding:0 26px 0 10px;
+  font-size:11.5px;font-weight:500;font-family:var(--font);color:var(--gray-dark);
+  background-color:var(--kit-light);
+  border:1.5px solid var(--gray-light);
+  border-radius:var(--r-xs);
+  outline:none;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23767A8C' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;background-size:8px;
+  transition:border-color .14s,box-shadow .14s
 }
-.file-cat-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(19,20,181,.09); }
+.file-meta-row .file-sel:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(19,20,181,.09)}
+.file-meta-row .file-sel.cat-sel{background-color:var(--light-blue);border-color:rgba(3,54,157,.18);color:var(--dark-blue)}
+.file-meta-row .file-sel.cat-sel:focus{border-color:var(--blue)}
+
+/* AI chip */
+.ai-chip-row{display:flex;gap:8px;margin-top:14px}
+.ai-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:20px;border:none;cursor:pointer;
+  font-size:12px;font-weight:700;font-family:var(--font);
+  background:var(--dark-blue);color:var(--white);
+  box-shadow:0 2px 8px rgba(3,54,157,.22);
+  transition:background .14s,box-shadow .14s;
+  white-space:nowrap
+}
+.ai-chip:hover{background:var(--blue);box-shadow:0 2px 12px rgba(19,20,181,.28)}
+.ai-chip:disabled{opacity:.5;cursor:not-allowed}
+.ai-chip svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.ai-chip .chip-spinner{width:11px;height:11px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+/* AI analysis result */
+.ai-result{
+  display:none;margin-top:12px;padding:14px 16px;
+  background:var(--blue-xl);border:1px solid rgba(19,20,181,.14);
+  border-radius:var(--r-sm);font-size:13px;color:var(--gray-dark);line-height:1.7
+}
+.ai-result-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:8px}
+.ai-result p{font-size:13px;color:var(--dark);line-height:1.7}
 
 /* ── FORM ────────────────────────────────────────────────────────────────── */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group.full { grid-column: 1/-1; }
-.flabel { font-size: 12px; font-weight: 600; color: var(--gray-dark); }
-.fopt   { font-weight: 400; color: var(--gray); }
-.form-control {
-  width: 100%; padding: 9px 13px;
-  font-size: 13px; font-family: var(--font); font-weight: 400; color: var(--dark);
-  background: var(--white);
-  border: 1.5px solid var(--gray-light);
-  border-radius: var(--r-sm);
-  outline: none;
-  transition: border-color .14s, box-shadow .14s;
-  -webkit-appearance: none; appearance: none;
-}
-.form-control:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(19,20,181,.09); }
-.form-control::placeholder { color: var(--gray-light); }
-select.form-control {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%23767A8C' d='M5.5 7.5L1 2h9z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer;
-}
-textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.flabel{font-size:12px;font-weight:600;color:var(--gray-dark)}
+.fopt{font-weight:400;color:var(--gray)}
+.form-control{width:100%;padding:9px 13px;font-size:13px;font-family:var(--font);font-weight:400;color:var(--dark);background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--r-sm);outline:none;transition:border-color .14s,box-shadow .14s;-webkit-appearance:none;appearance:none}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(19,20,181,.09)}
+.form-control::placeholder{color:var(--gray-light)}
+select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%23767A8C' d='M5.5 7.5L1 2h9z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+textarea.form-control{resize:vertical;min-height:82px;line-height:1.65}
 
 /* ── CARD FOOTER ─────────────────────────────────────────────────────────── */
-.card-footer {
-  padding: 16px 30px; background: var(--kit-light);
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-}
-.footer-note { font-size: 12px; color: var(--gray); font-weight: 500; }
-.btn-group { display: flex; gap: 10px; }
-
-.btn {
-  padding: 9px 20px; border-radius: var(--r-sm);
-  font-size: 13px; font-weight: 600; font-family: var(--font);
-  cursor: pointer; transition: all .14s;
-  display: flex; align-items: center; gap: 7px; white-space: nowrap;
-}
-.btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.75; }
-
-.btn-ghost {
-  background: var(--white); border: 1.5px solid var(--gray-light); color: var(--gray-dark);
-}
-.btn-ghost:hover { border-color: var(--gray); color: var(--dark); }
-
-.btn-primary {
-  background: #131415; border: 1.5px solid #131415; color: var(--white);
-  box-shadow: 0 2px 8px rgba(19,20,21,.22);
-}
-.btn-primary:hover  { background: #033690; border-color: #033690; box-shadow: 0 2px 10px rgba(3,54,144,.30); }
-.btn-primary:active { background: #033690; border-color: #033690; color: var(--gray); transform: scale(.98); box-shadow: none; }
-.btn-primary:disabled {
-  background: var(--gray-light); border-color: var(--gray-light);
-  color: var(--gray); cursor: not-allowed; box-shadow: none; transform: none;
-  opacity: 0.7;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.spinner {
-  width: 13px; height: 13px;
-  border: 2px solid rgba(255,255,255,.3);
-  border-top-color: white; border-radius: 50%;
-  animation: spin .7s linear infinite; flex-shrink: 0;
-}
+.card-footer{padding:16px 30px;background:var(--kit-light);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.footer-note{font-size:12px;color:var(--gray);font-weight:500}
+.btn-group{display:flex;gap:10px}
+.btn{padding:9px 20px;border-radius:var(--r-sm);font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.75}
+.btn-ghost{background:var(--white);border:1.5px solid var(--gray-light);color:var(--gray-dark)}
+.btn-ghost:hover{border-color:var(--gray);color:var(--dark)}
+.btn-primary{background:#131415;border:1.5px solid #131415;color:var(--white);box-shadow:0 2px 8px rgba(19,20,21,.22)}
+.btn-primary:hover{background:#033690;border-color:#033690;box-shadow:0 2px 10px rgba(3,54,144,.30)}
+.btn-primary:active{background:#033690;border-color:#033690;color:var(--gray);transform:scale(.98);box-shadow:none}
+.btn-primary:disabled{background:var(--gray-light);border-color:var(--gray-light);color:var(--gray);cursor:not-allowed;box-shadow:none;transform:none;opacity:.7}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 
 /* ── CHAT TAB ────────────────────────────────────────────────────────────── */
-.chat-hero { padding: 48px 0 28px; border-bottom: 1px solid var(--gray-light); margin-bottom: 32px; }
-.chat-hero h1 { font-size: 28px; font-weight: 700; color: var(--dark); letter-spacing: -.5px; margin-bottom: 8px; }
-.chat-hero p  { font-size: 13.5px; color: var(--gray); line-height: 1.7; }
-
-.chat-shell {
-  background: var(--white); border: 1px solid var(--gray-light);
-  border-radius: var(--r-xl); box-shadow: var(--sh-sm);
-  overflow: hidden; display: flex; flex-direction: column; height: 560px;
-}
-.chat-topbar {
-  padding: 14px 20px; border-bottom: 1px solid var(--gray-light);
-  background: var(--kit-light);
-  display: flex; align-items: center; gap: 11px;
-}
-.chat-av {
-  width: 34px; height: 34px; background: var(--dark-blue);
-  border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.chat-av svg { width: 15px; height: 15px; stroke: white; fill: none; stroke-width: 1.75; }
-.chat-av-name { font-size: 13px; font-weight: 700; color: var(--dark); }
-.chat-av-sub  { font-size: 11px; color: var(--gray); margin-top: 1px; font-weight: 500; }
-.chat-offline { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-light); margin-left: auto; flex-shrink: 0; }
-
-.chat-body {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 40px 28px; text-align: center;
-}
-.cs-icon {
-  width: 54px; height: 54px;
-  background: var(--light-blue); border: 1px solid rgba(3,54,157,.14);
-  border-radius: var(--r-lg);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
-}
-.cs-icon svg { width: 22px; height: 22px; stroke: var(--dark-blue); fill: none; stroke-width: 1.5; }
-.cs-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
-.cs-body  { font-size: 13.5px; color: var(--gray); line-height: 1.7; max-width: 360px; }
-.cs-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 22px; }
-.cs-chip  {
-  font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px;
-  background: var(--kit-light); border: 1px solid var(--gray-light); color: var(--gray-dark);
-}
-
-.chat-input-bar {
-  padding: 13px 16px; border-top: 1px solid var(--gray-light);
-  background: var(--kit-light);
-  display: flex; gap: 8px; align-items: center;
-}
-.chat-input {
-  flex: 1; padding: 9px 14px;
-  font-size: 13px; font-family: var(--font); color: var(--dark);
-  background: var(--white); border: 1.5px solid var(--gray-light);
-  border-radius: var(--r-sm); outline: none;
-}
-.chat-input::placeholder { color: var(--gray-light); }
-.chat-input:disabled { opacity: .45; cursor: not-allowed; }
-.chat-send {
-  width: 36px; height: 36px; flex-shrink: 0;
-  background: var(--blue); border: none; border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  cursor: not-allowed; opacity: .35;
-}
-.chat-send svg { width: 13px; height: 13px; stroke: white; fill: none; stroke-width: 1.8; }
+.chat-hero{padding:48px 0 28px;border-bottom:1px solid var(--gray-light);margin-bottom:32px}
+.chat-hero h1{font-size:28px;font-weight:700;color:var(--dark);letter-spacing:-.5px;margin-bottom:8px}
+.chat-hero p{font-size:13.5px;color:var(--gray);line-height:1.7}
+.chat-shell{background:var(--white);border:1px solid var(--gray-light);border-radius:var(--r-xl);box-shadow:var(--sh-sm);overflow:hidden;display:flex;flex-direction:column}
+.chat-topbar{padding:14px 20px;border-bottom:1px solid var(--gray-light);background:var(--kit-light);display:flex;align-items:center;gap:11px}
+.chat-av{width:34px;height:34px;background:#14294A;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-av svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:1.75}
+.chat-av-name{font-size:13px;font-weight:700;color:var(--dark)}
+.chat-av-sub{font-size:11px;color:var(--gray);margin-top:1px;font-weight:500}
+.chat-status-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-light);margin-left:auto;flex-shrink:0}
+.chat-status-dot.online{background:var(--accent)}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:360px;max-height:420px}
+.msg{max-width:75%;padding:10px 14px;border-radius:var(--r);font-size:13px;line-height:1.65}
+.msg.bot{background:var(--kit-light);border:1px solid var(--gray-light);color:var(--dark);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:#14294A;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.thinking{color:var(--gray);font-style:italic}
+.chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 28px;text-align:center;min-height:360px}
+.cs-icon{width:54px;height:54px;background:var(--light-blue);border:1px solid rgba(3,54,157,.14);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.cs-icon svg{width:22px;height:22px;stroke:var(--dark-blue);fill:none;stroke-width:1.5}
+.cs-title{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:10px}
+.cs-body{font-size:13.5px;color:var(--gray);line-height:1.7;max-width:360px}
+.cs-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px}
+.cs-chip{font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;background:var(--kit-light);border:1px solid var(--gray-light);color:var(--gray-dark);cursor:pointer;transition:background .14s,border-color .14s}
+.cs-chip:hover{background:var(--light-blue);border-color:rgba(3,54,157,.2);color:var(--dark-blue)}
+.chat-input-bar{padding:13px 16px;border-top:1px solid var(--gray-light);background:var(--kit-light);display:flex;gap:8px;align-items:center}
+.chat-input{flex:1;padding:9px 14px;font-size:13px;font-family:var(--font);color:var(--dark);background:var(--white);border:1.5px solid var(--gray-light);border-radius:var(--r-sm);outline:none;transition:border-color .14s}
+.chat-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(19,20,181,.09)}
+.chat-input::placeholder{color:var(--gray-light)}
+.chat-input:disabled{opacity:.45;cursor:not-allowed}
+.chat-send{width:36px;height:36px;flex-shrink:0;background:#14294A;border:none;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .14s}
+.chat-send:hover:not(:disabled){background:var(--dark-blue)}
+.chat-send:disabled{opacity:.35;cursor:not-allowed}
+.chat-send svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:1.8}
 
 /* ── MOBILE ──────────────────────────────────────────────────────────────── */
-@media (max-width: 620px) {
-  .topbar-inner, .body-wrap { padding-left: 18px; padding-right: 18px; }
-  .logo-tag, .topbar-sep { display: none; }
-  .nav-btn { padding: 0 14px; font-size: 12.5px; }
-  .page-hero { flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px 0 22px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .card-footer { flex-direction: column; align-items: flex-start; }
-  .card-section { padding: 20px 18px; }
-  .file-row { flex-direction: column; align-items: stretch; }
-  .file-item { flex: none; width: 100%; }
-  .chat-shell { height: 480px; }
+@media(max-width:620px){
+  .topbar-inner,.body-wrap{padding-left:18px;padding-right:18px}
+  .logo-tag,.topbar-sep{display:none}
+  .nav-btn{padding:0 14px;font-size:12.5px}
+  .page-hero{flex-direction:column;align-items:flex-start;gap:12px;padding:32px 0 22px}
+  .form-grid{grid-template-columns:1fr}
+  .card-footer{flex-direction:column;align-items:flex-start}
+  .card-section{padding:20px 18px}
+  .file-meta-row{flex-direction:column}
+  .file-meta-row .file-sel{min-width:0;width:100%}
+  .chat-shell{height:auto}
 }
 </style>
 </head>
@@ -425,12 +257,17 @@ textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
         <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         Upload
       </button>
+      <a class="nav-btn" href="dashboard.html" style="text-decoration:none">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
       <button class="nav-btn" data-tab="chat" type="button">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Ask Aria
-        <span class="nav-badge">Soon</span>
       </button>
     </nav>
+
+    <div class="topbar-right">Group 6 Traders</div>
   </div>
 </header>
 
@@ -443,7 +280,7 @@ textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
     <div class="page-hero">
       <div>
         <h1>Upload a document</h1>
-        <p>Files are automatically classified, tagged, and indexed for AI-powered analysis.</p>
+        <p>Files are automatically sorted, tagged, and indexed for AI-powered search and analysis.</p>
       </div>
       <div class="online-badge">
         <div class="online-dot"></div>
@@ -487,25 +324,54 @@ textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
         <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple
           style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px">
         <div class="file-list" id="fileList"></div>
+
+        <!-- AI Analyse button -->
+        <div class="ai-chip-row" id="aiChipRow" style="display:none">
+          <button class="ai-chip" id="btnAnalyse" type="button">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Analyse with AI
+          </button>
+        </div>
+
+        <div class="ai-result" id="aiResult">
+          <div class="ai-result-label">Aria AI Analysis</div>
+          <p id="aiResultText"></p>
+        </div>
       </div>
 
       <!-- Document details -->
       <div class="card-section">
         <div class="slabel">Document details</div>
         <div class="form-grid">
+
           <div class="form-group">
             <label class="flabel">Department <span class="req">*</span></label>
             <select class="form-control" id="selDept">
               <option value="">Select department</option>
-              <option>Finance</option><option>Operations</option>
-              <option>Marketing</option><option>Sales</option>
-              <option>IT</option><option>Executive</option>
+              <option>Finance</option>
+              <option>Operations</option>
+              <option>Marketing</option>
+              <option>Sales</option>
+              <option>IT</option>
+              <option>Executive</option>
             </select>
           </div>
+
+          <div class="form-group">
+            <label class="flabel">Related party <span class="fopt">(vendor / customer)</span></label>
+            <input type="text" class="form-control" id="inputRelatedParty" placeholder="e.g. Acme Supplies Ltd">
+          </div>
+
+          <div class="form-group">
+            <label class="flabel">Document date <span class="fopt">(optional)</span></label>
+            <input type="date" class="form-control" id="inputDocDate">
+          </div>
+
           <div class="form-group full">
             <label class="flabel">Notes <span class="fopt">(optional)</span></label>
             <textarea class="form-control" id="inputNotes" placeholder="Any additional context about this document..."></textarea>
           </div>
+
         </div>
       </div>
 
@@ -529,12 +395,7 @@ textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
         <span class="footer-note">Fields marked <span style="color:#C53030;font-weight:700">*</span> are required</span>
         <div class="btn-group">
           <button class="btn btn-ghost" id="btnClear" type="button">
-            <svg viewBox="0 0 24 24">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6M14 11v6"/>
-              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-            </svg>
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             Clear
           </button>
           <button class="btn btn-primary" id="btnSubmit" type="button">
@@ -562,28 +423,30 @@ textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
         </div>
         <div>
           <div class="chat-av-name">Aria</div>
-          <div class="chat-av-sub">AI Document Analyst</div>
+          <div class="chat-av-sub">AI Document Analyst · Powered by Azure AI Foundry</div>
         </div>
-        <div class="chat-offline"></div>
+        <div class="chat-status-dot online" id="chatDot"></div>
       </div>
 
-      <div class="chat-body">
+      <div id="chatEmptyState" class="chat-empty">
         <div class="cs-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
-        <div class="cs-title">Chat interface coming soon</div>
-        <div class="cs-body">Aria will let you query uploaded documents, retrieve records, and surface financial insights — all in plain language.</div>
+        <div class="cs-title">Document Intelligence Assistant</div>
+        <div class="cs-body">Ask me anything about your uploaded documents, invoice statuses, stock reports, or how the portal works.</div>
         <div class="cs-chips">
-          <span class="cs-chip">Summarise invoices</span>
-          <span class="cs-chip">Find purchase orders</span>
-          <span class="cs-chip">Stock report trends</span>
-          <span class="cs-chip">Export data</span>
+          <span class="cs-chip" data-msg="Summarise recent invoices">Summarise invoices</span>
+          <span class="cs-chip" data-msg="Show me recent purchase orders">Find purchase orders</span>
+          <span class="cs-chip" data-msg="What are the stock report trends?">Stock report trends</span>
+          <span class="cs-chip" data-msg="How does document classification work?">How does this work?</span>
         </div>
       </div>
+
+      <div id="chatMessages" class="chat-messages" style="display:none"></div>
 
       <div class="chat-input-bar">
-        <input class="chat-input" type="text" placeholder="Ask about your documents…" disabled>
-        <button class="chat-send" disabled type="button">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Ask about your documents…">
+        <button class="chat-send" id="chatSend" type="button">
           <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
@@ -594,22 +457,23 @@ textarea.form-control { resize: vertical; min-height: 82px; line-height: 1.65; }
 </main>
 
 <script>
-/* Tab switching */
-document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', function () {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    this.classList.add('active');
-    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
-  });
-});
-
-/* Config */
+/* ── CONFIG ──────────────────────────────────────────────────────────────── */
 const FLOW_URL = 'https://default3a655eac4a934e91999a366baf02ca.c8.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e8001c1838474bf5bade5eae9ced8846/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8flBlD9HtzDWir2PW5uGKMSDVGiGGpIndFoDgPw2Cs0';
 const DEMO_MODE = FLOW_URL === '';
 
+const DOC_TYPES = [
+  { value: '', label: 'Doc type (optional)' },
+  { value: 'Invoice',          label: 'Invoice' },
+  { value: 'Purchase Order',   label: 'Purchase Order' },
+  { value: 'Stock Report',     label: 'Stock Report' },
+  { value: 'Order',            label: 'Order' },
+  { value: 'Financial Report', label: 'Financial Report' },
+  { value: 'Contract',         label: 'Contract' },
+  { value: 'Other',            label: 'Other' },
+];
+
 const CAT_OPTS = [
-  { value: '',               label: 'Select category' },
+  { value: '',               label: 'Select Stock Category' },
   { value: 'All Categories', label: 'All Categories — Monthly Report' },
   { value: 'Beverages',      label: '1 — Beverages' },
   { value: 'Condiments',     label: '2 — Condiments' },
@@ -621,10 +485,23 @@ const CAT_OPTS = [
   { value: 'Seafood',        label: '8 — Seafood' },
 ];
 
-let files = [];
-let bannerTimer = null;
-const isStock = n => n.toLowerCase().startsWith('stockreport_');
+const isStockFilename = n => n.toLowerCase().startsWith('stockreport_');
+const needsCategory = (type, name) => isStockFilename(name);
 
+let files = [];        // { file, docType, category }
+let bannerTimer = null;
+
+/* ── TAB SWITCHING ───────────────────────────────────────────────────────── */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── FILE HANDLING ───────────────────────────────────────────────────────── */
 document.getElementById('fileInput').addEventListener('change', function () { addFiles(this.files); });
 const dz = document.getElementById('dropZoneInner');
 dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
@@ -633,10 +510,20 @@ dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag
 
 function syncSubmitBtn() {
   document.getElementById('btnSubmit').disabled = files.length === 0;
+  document.getElementById('aiChipRow').style.display = files.length ? 'flex' : 'none';
 }
 
 function addFiles(fs) {
-  for (const f of fs) files.push({ file: f, category: '' });
+  for (const f of fs) {
+    // Auto-detect doc type from filename
+    const n   = f.name.toLowerCase();
+    let auto  = '';
+    if      (n.startsWith('invoice_'))         auto = 'Invoice';
+    else if (n.startsWith('purchase_orders_')) auto = 'Purchase Order';
+    else if (n.startsWith('stockreport_'))     auto = 'Stock Report';
+    else if (n.startsWith('order_'))           auto = 'Order';
+    files.push({ file: f, docType: auto, category: '' });
+  }
   renderFiles();
   syncSubmitBtn();
 }
@@ -645,32 +532,120 @@ function renderFiles() {
   const list = document.getElementById('fileList');
   if (!files.length) { list.style.display = 'none'; return; }
   list.style.display = 'flex';
+
   list.innerHTML = files.map((entry, i) => {
     const f   = entry.file;
     const ext = f.name.split('.').pop().toLowerCase();
     const cls = ext==='pdf'?'pdf':['doc','docx'].includes(ext)?'doc':['xls','xlsx'].includes(ext)?'xls':'other';
     const sz  = f.size < 1048576 ? (f.size/1024).toFixed(0)+'KB' : (f.size/1048576).toFixed(1)+'MB';
-    const cat = isStock(f.name)
-      ? `<select class="file-cat-select" data-index="${i}">${CAT_OPTS.map(o=>`<option value="${o.value}"${entry.category===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`
+
+    const typeSelect = `<select class="file-sel type-sel" data-index="${i}">
+      ${DOC_TYPES.map(o=>`<option value="${o.value}"${entry.docType===o.value?' selected':''}>${o.label}</option>`).join('')}
+    </select>`;
+
+    const showCat = needsCategory(entry.docType, f.name);
+    const catSelect = showCat
+      ? `<select class="file-sel cat-sel" data-index="${i}">
+          ${CAT_OPTS.map(o=>`<option value="${o.value}"${entry.category===o.value?' selected':''}>${o.label}</option>`).join('')}
+         </select>`
       : '';
-    return `<div class="file-row"><div class="file-item"><div class="file-item-main"><div class="fext ${cls}">${ext.toUpperCase().slice(0,3)}</div><span class="fname">${f.name}</span><span class="fsize">${sz}</span><button class="frm" data-i="${i}" type="button"><svg width="11" height="11" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="1.5" y1="1.5" x2="11.5" y2="11.5"/><line x1="11.5" y1="1.5" x2="1.5" y2="11.5"/></svg></button></div></div>${cat}</div>`;
+
+    return `
+      <div class="file-row" data-index="${i}">
+        <div class="file-item-main">
+          <div class="fext ${cls}">${ext.toUpperCase().slice(0,3)}</div>
+          <span class="fname">${f.name}</span>
+          <span class="fsize">${sz}</span>
+          <button class="frm" data-i="${i}" type="button">
+            <svg width="11" height="11" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8">
+              <line x1="1.5" y1="1.5" x2="11.5" y2="11.5"/>
+              <line x1="11.5" y1="1.5" x2="1.5" y2="11.5"/>
+            </svg>
+          </button>
+        </div>
+        <div class="file-meta-row">${typeSelect}${catSelect}</div>
+      </div>`;
   }).join('');
+
+  // Remove button
   list.querySelectorAll('.frm').forEach(b =>
-    b.addEventListener('click', function () { files.splice(+this.dataset.i, 1); renderFiles(); syncSubmitBtn(); })
+    b.addEventListener('click', function () {
+      files.splice(+this.dataset.i, 1);
+      renderFiles(); syncSubmitBtn();
+    })
   );
-  list.querySelectorAll('.file-cat-select').forEach(s =>
-    s.addEventListener('change', function () { files[+this.dataset.index].category = this.value; })
+
+  // Doc type change → re-render to show/hide category
+  list.querySelectorAll('.type-sel').forEach(s =>
+    s.addEventListener('change', function () {
+      files[+this.dataset.index].docType = this.value;
+      renderFiles(); syncSubmitBtn();
+    })
+  );
+
+  // Category change
+  list.querySelectorAll('.cat-sel').forEach(s =>
+    s.addEventListener('change', function () {
+      files[+this.dataset.index].category = this.value;
+    })
   );
 }
 
-function extractOrderID(name) {
-  const n = name.toLowerCase();
-  if (n.startsWith('invoice_'))         return name.slice(8).replace(/\.(pdf|docx|xlsx)$/i,'');
-  if (n.startsWith('purchase_orders_')) return name.slice(16).replace(/\.(pdf|docx|xlsx)$/i,'');
-  if (n.startsWith('order_'))           return name.slice(6).replace(/\.(pdf|docx|xlsx)$/i,'');
-  return '';
-}
+/* ── AI ANALYSE ──────────────────────────────────────────────────────────── */
+document.getElementById('btnAnalyse').addEventListener('click', async function () {
+  if (!files.length) return;
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="chip-spinner"></div> Analysing…';
 
+  const resultBox  = document.getElementById('aiResult');
+  const resultText = document.getElementById('aiResultText');
+  resultBox.style.display = 'none';
+
+  // Build a summary of what's been added for the LLM
+  const filesSummary = files.map((e, i) =>
+    `${i+1}. "${e.file.name}" (${(e.file.size/1024).toFixed(0)} KB)${e.docType ? ', type: '+e.docType : ''}${e.category ? ', category: '+e.category : ''}`
+  ).join('\n');
+
+  const dept  = document.getElementById('selDept').value;
+  const party = document.getElementById('inputRelatedParty').value;
+  const notes = document.getElementById('inputNotes').value;
+
+  const prompt = `You are Aria, an AI Document Analyst for Group 6 Traders — a trading company. 
+The user is about to upload the following document(s) to SharePoint:
+
+${filesSummary}
+
+${dept   ? 'Department: ' + dept   : ''}
+${party  ? 'Related party: ' + party : ''}
+${notes  ? 'Notes: ' + notes       : ''}
+
+In 2-4 concise sentences, provide a brief intelligent analysis: infer what these documents likely contain based on their names, suggest the document type if not set, flag anything notable (e.g. multiple file types, missing metadata, possible duplicates), and confirm they look ready for upload. Be helpful, professional, and specific. Do not use bullet points.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.map(b => b.text || '').join('') || 'No analysis returned.';
+    resultText.textContent = text;
+    resultBox.style.display = 'block';
+  } catch (err) {
+    resultText.textContent = 'Analysis unavailable — please check your connection.';
+    resultBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Analyse with AI';
+});
+
+/* ── BANNERS ─────────────────────────────────────────────────────────────── */
 function hideBanner(el) {
   el.style.animation = 'bOut .26s ease forwards';
   setTimeout(() => { el.style.display='none'; el.style.animation=''; }, 260);
@@ -679,18 +654,19 @@ function showBanner(type, msg) {
   if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
   const s = document.getElementById('bannerSuccess');
   const e = document.getElementById('bannerError');
-  s.style.display = 'none'; e.style.display = 'none';
+  s.style.display='none'; e.style.display='none';
   if (type === 'success') {
-    s.style.animation = 'bIn .26s ease'; s.style.display = 'flex';
+    s.style.animation='bIn .26s ease'; s.style.display='flex';
     bannerTimer = setTimeout(() => hideBanner(s), 4000);
   } else {
     document.getElementById('errorMsg').textContent = msg || 'Something went wrong. Please try again.';
-    e.style.animation = 'bIn .26s ease'; e.style.display = 'flex';
+    e.style.animation='bIn .26s ease'; e.style.display='flex';
     bannerTimer = setTimeout(() => hideBanner(e), 5000);
   }
-  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+  try { window.scrollTo({ top:0, behavior:'smooth' }); } catch(_) {}
 }
 
+/* ── PROGRESS ────────────────────────────────────────────────────────────── */
 function setProgress(pct, label) {
   const wrap = document.getElementById('progressWrap');
   const bar  = document.getElementById('progressBar');
@@ -698,7 +674,6 @@ function setProgress(pct, label) {
   if (pct === null) { wrap.style.display='none'; bar.style.width='0%'; return; }
   wrap.style.display='block'; bar.style.width=pct+'%'; lbl.textContent=label;
 }
-
 function setBtn(loading) {
   const btn = document.getElementById('btnSubmit');
   btn.disabled = loading;
@@ -707,6 +682,7 @@ function setBtn(loading) {
     : '<svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Upload to SharePoint';
 }
 
+/* ── FILE UTILS ──────────────────────────────────────────────────────────── */
 function toBase64(file) {
   return new Promise((res, rej) => {
     const r = new FileReader();
@@ -715,7 +691,15 @@ function toBase64(file) {
     r.readAsDataURL(file);
   });
 }
+function extractOrderID(name) {
+  const n = name.toLowerCase();
+  if (n.startsWith('invoice_'))         return name.slice(8).replace(/\.(pdf|docx|xlsx)$/i,'');
+  if (n.startsWith('purchase_orders_')) return name.slice(16).replace(/\.(pdf|docx|xlsx)$/i,'');
+  if (n.startsWith('order_'))           return name.slice(6).replace(/\.(pdf|docx|xlsx)$/i,'');
+  return '';
+}
 
+/* ── SUBMIT ──────────────────────────────────────────────────────────────── */
 async function handleSubmit() {
   if (!files.length)                                                  { showBanner('error','Please select at least one file.'); return; }
   if (!document.getElementById('selDept').value)                     { showBanner('error','Please select a department.'); return; }
@@ -724,6 +708,8 @@ async function handleSubmit() {
   const uploaderName  = document.getElementById('inputUploaderName').value.trim();
   const uploaderEmail = document.getElementById('inputUploaderEmail').value.trim();
   const uploadedBy    = uploaderEmail ? `${uploaderName} <${uploaderEmail}>` : uploaderName;
+  const relatedParty  = document.getElementById('inputRelatedParty').value.trim();
+  const docDate       = document.getElementById('inputDocDate').value || new Date().toISOString().split('T')[0];
 
   setBtn(true); setProgress(10, 'Reading files…');
 
@@ -737,14 +723,16 @@ async function handleSubmit() {
 
   try {
     for (let i = 0; i < files.length; i++) {
-      const { file, category } = files[i];
+      const { file, docType, category } = files[i];
       setProgress(Math.round(20 + (i/files.length)*60), `Uploading ${i+1} of ${files.length}: ${file.name}`);
       const base64  = await toBase64(file);
       const payload = {
         fileName:     file.name,
         fileContent:  base64,
         department:   document.getElementById('selDept').value,
-        documentDate: new Date().toISOString().split('T')[0],
+        documentType: docType,
+        documentDate: docDate,
+        relatedParty,
         orderID:      extractOrderID(file.name),
         category,
         notes:        document.getElementById('inputNotes').value,
@@ -754,7 +742,7 @@ async function handleSubmit() {
       if (!res.ok && res.status !== 202) throw new Error(`${file.name} — server returned ${res.status}`);
     }
     setProgress(null); setBtn(false); showBanner('success'); resetFields();
-  } catch (err) {
+  } catch(err) {
     setProgress(null); setBtn(false);
     showBanner('error','Upload failed: ' + err.message + '. Check your network and try again.');
   }
@@ -762,8 +750,12 @@ async function handleSubmit() {
 
 function resetFields() {
   files = []; renderFiles(); syncSubmitBtn();
-  ['inputNotes','inputUploaderName','inputUploaderEmail'].forEach(id => document.getElementById(id).value = '');
+  ['inputNotes','inputUploaderName','inputUploaderEmail','inputRelatedParty','inputDocDate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   document.getElementById('selDept').value = '';
+  document.getElementById('aiResult').style.display = 'none';
 }
 function resetForm() {
   resetFields();
@@ -773,8 +765,76 @@ function resetForm() {
   setProgress(null);
 }
 
+/* ── CHAT ────────────────────────────────────────────────────────────────── */
+let chatHistory = [];
+
+function appendMsg(role, text) {
+  const empty = document.getElementById('chatEmptyState');
+  const msgs  = document.getElementById('chatMessages');
+  if (empty.style.display !== 'none') { empty.style.display='none'; msgs.style.display='flex'; }
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendChat(text) {
+  if (!text.trim()) return;
+  const input  = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSend');
+  input.value  = '';
+  input.disabled = true;
+  sendBtn.disabled = true;
+
+  appendMsg('user', text);
+  const thinking = appendMsg('bot thinking', 'Aria is thinking…');
+
+  chatHistory.push({ role: 'user', content: text });
+
+  const systemPrompt = `You are Aria, an AI Document Analyst for Group 6 Traders — a trading company. You help users understand their uploaded documents (invoices, purchase orders, stock reports, financial reports, contracts). You are knowledgeable about the Document Intelligence Portal which uses Microsoft Power Automate, SharePoint, and AI Builder to classify and route documents. Be concise, professional, and helpful. If asked about specific document data you don't have access to, explain that you work with the portal itself rather than live document data, and guide them accordingly.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+    const data = await resp.json();
+    const reply = data.content?.map(b => b.text || '').join('') || 'Sorry, I couldn\'t get a response.';
+    thinking.remove();
+    appendMsg('bot', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch(err) {
+    thinking.remove();
+    appendMsg('bot', 'Connection error — please try again.');
+    chatHistory.pop();
+  }
+
+  input.disabled  = false;
+  sendBtn.disabled = false;
+  input.focus();
+}
+
+document.getElementById('chatSend').addEventListener('click', () => {
+  sendChat(document.getElementById('chatInput').value);
+});
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(e.target.value); }
+});
+document.querySelectorAll('.cs-chip').forEach(chip => {
+  chip.addEventListener('click', () => sendChat(chip.dataset.msg));
+});
+
+/* ── INIT ────────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  syncSubmitBtn(); // disabled until files added
+  syncSubmitBtn();
   document.getElementById('btnSubmit').addEventListener('click', handleSubmit);
   document.getElementById('btnClear').addEventListener('click', resetForm);
 });
