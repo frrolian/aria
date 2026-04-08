@@ -462,14 +462,11 @@ const FLOW_URL = 'https://default3a655eac4a934e91999a366baf02ca.c8.environment.a
 const DEMO_MODE = FLOW_URL === '';
 
 const DOC_TYPES = [
-  { value: '', label: 'Doc type (optional)' },
-  { value: 'Invoice',          label: 'Invoice' },
-  { value: 'Purchase Order',   label: 'Purchase Order' },
-  { value: 'Stock Report',     label: 'Stock Report' },
-  { value: 'Order',            label: 'Order' },
-  { value: 'Financial Report', label: 'Financial Report' },
-  { value: 'Contract',         label: 'Contract' },
-  { value: 'Other',            label: 'Other' },
+  { value: '',              label: 'Doc type (optional)' },
+  { value: 'Invoice',       label: 'Invoice' },
+  { value: 'PurchaseOrder', label: 'Purchase Order' },
+  { value: 'ShippingOrder', label: 'Shipping Order' },
+  { value: 'StockReport',   label: 'Stock Report' },
 ];
 
 const CAT_OPTS = [
@@ -519,9 +516,9 @@ function addFiles(fs) {
     const n   = f.name.toLowerCase();
     let auto  = '';
     if      (n.startsWith('invoice_'))         auto = 'Invoice';
-    else if (n.startsWith('purchase_orders_')) auto = 'Purchase Order';
-    else if (n.startsWith('stockreport_'))     auto = 'Stock Report';
-    else if (n.startsWith('order_'))           auto = 'Order';
+    else if (n.startsWith('purchase_orders_')) auto = 'PurchaseOrder';
+    else if (n.startsWith('shippingorder_'))   auto = 'ShippingOrder';
+    else if (n.startsWith('stockreport_'))     auto = 'StockReport';
     files.push({ file: f, docType: auto, category: '' });
   }
   renderFiles();
@@ -695,7 +692,7 @@ function extractOrderID(name) {
   const n = name.toLowerCase();
   if (n.startsWith('invoice_'))         return name.slice(8).replace(/\.(pdf|docx|xlsx)$/i,'');
   if (n.startsWith('purchase_orders_')) return name.slice(16).replace(/\.(pdf|docx|xlsx)$/i,'');
-  if (n.startsWith('order_'))           return name.slice(6).replace(/\.(pdf|docx|xlsx)$/i,'');
+  if (n.startsWith('shippingorder_'))   return name.slice(14).replace(/\.(pdf|docx|xlsx)$/i,'');
   return '';
 }
 
